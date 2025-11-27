@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, ShoppingCart, Package, Shield, Truck, CreditCard, Mail, Phone, MapPin, MessageCircle, Sparkles } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion } from "framer-motion";
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';

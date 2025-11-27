@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { ArrowRight, Heart, Sparkles, Package, Shield, Truck, Star, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
-import { motion, useMotionValue, useAnimation, PanInfo } from 'motion/react';
+import { motion, useMotionValue, useAnimation, PanInfo } from "framer-motion";
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { ImageWithFallback } from './figma/ImageWithFallback';

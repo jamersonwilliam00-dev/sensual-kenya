@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, Filter, Sparkles, TrendingUp, Heart, Star } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from "framer-motion";
 import { ProductCard } from './ProductCard';
 import { Input } from './ui/input';
 import { Button } from './ui/button';

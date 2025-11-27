@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Calendar, Clock, ArrowRight, Search, Heart, ThumbsUp, MessageCircle, Share2, Sparkles } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion } from "framer-motion";
 import { Card, CardContent, CardFooter } from './ui/card';
 import { Badge } from './ui/badge';
 import { Input } from './ui/input';

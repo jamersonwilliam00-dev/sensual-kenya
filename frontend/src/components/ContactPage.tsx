@@ -1,5 +1,5 @@
 import { MessageCircle, Mail, Phone, MapPin, Clock, Sparkles, Heart, Lock, ShoppingBag, Truck, CreditCard, RotateCcw, AlertCircle } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion } from "framer-motion";
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';

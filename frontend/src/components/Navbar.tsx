@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Heart, ShoppingCart, Menu, X, Sun, Moon, User, Sparkles, ChevronDown } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from './ui/sheet';
 import { Badge } from './ui/badge';

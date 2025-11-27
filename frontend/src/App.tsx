@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion } from "framer-motion";
 import { Navbar } from './components/Navbar';
 import { HomePage } from './components/HomePage';
 import { StorePage } from './components/StorePage';

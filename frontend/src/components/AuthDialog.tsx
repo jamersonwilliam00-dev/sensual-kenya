@@ -5,7 +5,7 @@ import { Label } from './ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { toast } from 'sonner@2.0.3';
-import { motion } from 'motion/react';
+import { motion } from "framer-motion";
 import { User, Mail, Lock, Sparkles, Heart } from 'lucide-react';
 
 interface AuthDialogProps {
