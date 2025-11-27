@@ -36,7 +36,7 @@ interface UserData {
 
 // 🔒 SECURITY: Secret admin panel URL path
 // Access admin by typing: yourdomain.com/#/internal-mgmt-portal-sk2025
-const SECRET_ADMIN_PATH = 'internal-mgmt-portal-sk2025';
+const SECRET_ADMIN_PATH = import.meta.env.VITE_ADMIN_PATH;
 
 export default function App() {
   const [currentSection, setCurrentSection] = useState('home');
