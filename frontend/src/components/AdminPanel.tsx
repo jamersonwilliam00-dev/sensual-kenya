@@ -867,13 +867,12 @@ function ProductForm({ product, onSave, loading }: any) {
         {/* Upload from Device */}
         <div>
           <Label htmlFor="image-upload" className="text-sm text-muted-foreground">
-            Upload from Device (Mobile/Camera)
+            Upload from Device (Gallery or Camera)
           </Label>
           <Input
             id="image-upload"
             type="file"
             accept="image/*"
-            capture="environment"
             onChange={handleImageUpload}
             disabled={uploading}
             className="cursor-pointer"

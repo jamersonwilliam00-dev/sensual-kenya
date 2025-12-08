@@ -16,7 +16,7 @@ interface AuthDialogProps {
 }
 
 // Secure admin password - only for authorized personnel
-const ADMIN_PASSWORD = 'Sensual2025Kenya!#Pink';
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PWD;
 
 export function AuthDialog({ open, onOpenChange, onSuccess, mode = 'user' }: AuthDialogProps) {
   const [loading, setLoading] = useState(false);
