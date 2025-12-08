@@ -13,6 +13,7 @@ interface RegionSelectorProps {
 const DELIVERY_REGIONS = [
   // CBD - Free/Lowest Cost
   { name: 'CBD Errands', charge: 100, area: 'Nairobi CBD' },
+  { name: 'Pickup Shelf', charge: 0, area: 'Dynamic Mall 5th Floor Shop Ml212, Nairobi CBD' },
   
   // NGONG ROAD
   { name: 'Upperhill', charge: 300, area: 'Ngong Road' },
