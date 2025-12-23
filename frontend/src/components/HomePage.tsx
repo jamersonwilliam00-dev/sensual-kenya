@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { ArrowRight, Heart, Sparkles, Package, Shield, Truck, Star, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
-import { motion, useMotionValue, useAnimation, PanInfo } from "framer-motion";
+import { motion, useMotionValue, useAnimation, PanInfo } from 'framer-motion';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -256,7 +256,7 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
           >
             {/* Glowing Title */}
             <h1 
-              className="text-5xl md:text-7xl lg:text-8xl text-white mb-6 drop-shadow-2xl"
+              className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl text-white mb-4 md:mb-6 drop-shadow-2xl px-2"
               style={{
                 textShadow: '0 0 40px rgba(236, 72, 153, 0.5), 0 0 80px rgba(236, 72, 153, 0.3)',
                 fontWeight: 600,
@@ -268,7 +268,7 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
           </motion.div>
 
           <motion.p
-            className="text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto drop-shadow-lg"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 mb-8 md:mb-12 max-w-3xl mx-auto drop-shadow-lg px-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
             transition={{ duration: 1, delay: 0.4 }}
@@ -278,7 +278,7 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
 
           {/* CTA Buttons */}
           <motion.div
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
+            className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center mb-12 md:mb-16 px-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
             transition={{ duration: 1, delay: 0.6 }}
@@ -286,13 +286,14 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
             <motion.div
               whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(236, 72, 153, 0.6)" }}
               whileTap={{ scale: 0.95 }}
+              className="w-full sm:w-auto"
             >
               <Button 
                 size="lg" 
-                className="text-lg px-8 py-6 bg-gradient-to-r from-pink-600 to-pink-500 hover:from-pink-500 hover:to-pink-400 shadow-2xl"
+                className="w-full sm:w-auto text-base md:text-lg px-6 md:px-8 py-5 md:py-6 bg-gradient-to-r from-pink-600 to-pink-500 hover:from-pink-500 hover:to-pink-400 shadow-2xl"
                 onClick={() => onNavigate('main-store')}
               >
-                <Heart className="mr-2 h-5 w-5" />
+                <Heart className="mr-2 h-4 w-4 md:h-5 md:w-5" />
                 Shop Adult Toys
               </Button>
             </motion.div>
@@ -300,14 +301,15 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
             <motion.div
               whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(236, 72, 153, 0.6)" }}
               whileTap={{ scale: 0.95 }}
+              className="w-full sm:w-auto"
             >
               <Button 
                 size="lg" 
                 variant="outline"
-                className="text-lg px-8 py-6 bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20"
+                className="w-full sm:w-auto text-base md:text-lg px-6 md:px-8 py-5 md:py-6 bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20"
                 onClick={() => onNavigate('lingerie-store')}
               >
-                <Sparkles className="mr-2 h-5 w-5" />
+                <Sparkles className="mr-2 h-4 w-4 md:h-5 md:w-5" />
                 Browse Lingerie
               </Button>
             </motion.div>
@@ -318,9 +320,9 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: isVisible ? 1 : 0, scale: isVisible ? 1 : 0.8 }}
             transition={{ duration: 1, delay: 0.8 }}
-            className="inline-block"
+            className="inline-block px-4"
           >
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-8 py-6 shadow-2xl">
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-4 sm:px-6 md:px-8 py-4 md:py-6 shadow-2xl">
               <motion.div
                 animate={{
                   boxShadow: [
@@ -331,8 +333,8 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
                 }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                <p className="text-white/70 text-sm mb-2">Trusted by</p>
-                <div className="flex items-center gap-2">
+                <p className="text-white/70 text-xs sm:text-sm mb-2">Trusted by</p>
+                <div className="flex items-center gap-1 md:gap-2 justify-center">
                   {[...Array(5)].map((_, i) => (
                     <motion.div
                       key={i}
@@ -340,11 +342,11 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 1 + i * 0.1 }}
                     >
-                      <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+                      <Star className="h-4 w-4 md:h-5 md:w-5 text-yellow-400 fill-yellow-400" />
                     </motion.div>
                   ))}
                 </div>
-                <p className="text-3xl md:text-4xl text-white mt-2" style={{ fontWeight: 700 }}>
+                <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-white mt-2" style={{ fontWeight: 700 }}>
                   <AnimatedCounter target={10000} /> Happy Customers
                 </p>
               </motion.div>
@@ -395,7 +397,7 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
             <div className="relative">
               {/* Navigation Arrows */}
               <motion.button
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-md hover:bg-background border-2 border-primary/30 rounded-full p-3 shadow-xl hover:shadow-2xl transition-all"
+                className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-md hover:bg-background border-2 border-primary/30 rounded-full p-3 shadow-xl hover:shadow-2xl transition-all"
                 onClick={prevSlide}
                 whileHover={{ scale: 1.1, x: -5 }}
                 whileTap={{ scale: 0.9 }}
@@ -404,7 +406,7 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
               </motion.button>
 
               <motion.button
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-md hover:bg-background border-2 border-primary/30 rounded-full p-3 shadow-xl hover:shadow-2xl transition-all"
+                className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-md hover:bg-background border-2 border-primary/30 rounded-full p-3 shadow-xl hover:shadow-2xl transition-all"
                 onClick={nextSlide}
                 whileHover={{ scale: 1.1, x: 5 }}
                 whileTap={{ scale: 0.9 }}
@@ -413,10 +415,10 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
               </motion.button>
 
               {/* Carousel Track */}
-              <div className="overflow-hidden mx-12">
+              <div className="overflow-hidden mx-4 sm:mx-8 md:mx-12">
                 <motion.div
                   ref={carouselRef}
-                  className="flex gap-6"
+                  className="flex gap-4 md:gap-6"
                   drag="x"
                   dragConstraints={{ left: -1600, right: 0 }}
                   onDragEnd={handleDragEnd}
@@ -426,7 +428,7 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
                   {trendingProducts.map((product, index) => (
                     <motion.div
                       key={product.id}
-                      className="min-w-[320px]"
+                      className="min-w-[280px] sm:min-w-[300px] md:min-w-[320px]"
                       initial={{ opacity: 0, scale: 0.9 }}
                       whileInView={{ opacity: 1, scale: 1 }}
                       viewport={{ once: true }}
