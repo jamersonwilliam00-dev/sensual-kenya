@@ -5,6 +5,19 @@ import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Badge } from './ui/badge';
+import { projectId, publicAnonKey } from '../utils/supabase/info';
+
+interface TrendingProduct {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
+  image?: string;
+  description?: string;
+  inStock?: boolean;
+  store: 'main' | 'lingerie';
+  badge: string;
+}
 
 interface HomePageProps {
   onNavigate: (section: string) => void;
@@ -108,6 +121,8 @@ function SparklesEffect() {
 export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewProduct }: HomePageProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [trendingProducts, setTrendingProducts] = useState<TrendingProduct[]>([]);
+  const [isTrendingLoading, setIsTrendingLoading] = useState(true);
   const carouselRef = useRef<HTMLDivElement>(null);
   const dragX = useMotionValue(0);
   const controls = useAnimation();
@@ -116,65 +131,55 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
     setIsVisible(true);
   }, []);
 
-  const trendingProducts = [
-    {
-      id: 'products:main:5',
-      name: 'The Rabbit (New Model)',
-      price: 2999,
-      store: 'main',
-      category: 'Vibrators',
-      image: 'https://images.unsplash.com/photo-1625154253125-5d89afab6c7c?w=400',
-      badge: 'Trending'
-    },
-    {
-      id: 'products:lingerie:1',
-      name: 'Candi Eros Lingerie',
-      price: 999,
-      store: 'lingerie',
-      category: 'Sexy Lingerie',
-      image: 'https://images.unsplash.com/photo-1591079496752-a56c5474af3f?w=400',
-      badge: 'Popular'
-    },
-    {
-      id: 'products:main:2',
-      name: 'Mini Vibrating Panties',
-      price: 2900,
-      store: 'main',
-      category: 'Vibrators',
-      image: 'https://images.unsplash.com/photo-1625154253125-5d89afab6c7c?w=400',
-      badge: 'New'
-    },
-    {
-      id: 'products:lingerie:3',
-      name: 'Sexy Floral Lace Bodysuit',
-      price: 1600,
-      store: 'lingerie',
-      category: 'Sexy Lingerie',
-      image: 'https://images.unsplash.com/photo-1591079496752-a56c5474af3f?w=400',
-      badge: 'Hot'
-    },
-    {
-      id: 'products:main:6',
-      name: 'Luxury Massager',
-      price: 3499,
-      store: 'main',
-      category: 'Massagers',
-      image: 'https://images.unsplash.com/photo-1625154253125-5d89afab6c7c?w=400',
-      badge: 'Premium'
-    },
-    {
-      id: 'products:lingerie:4',
-      name: 'Satin Robe Set',
-      price: 1299,
-      store: 'lingerie',
-      category: 'Sleepwear',
-      image: 'https://images.unsplash.com/photo-1591079496752-a56c5474af3f?w=400',
-      badge: 'Bestseller'
-    }
-  ];
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadStoreProducts = async (store: TrendingProduct['store']) => {
+      try {
+        const response = await fetch(
+          `https://${projectId}.supabase.co/functions/v1/make-server-afd25991/products?store=${store}`,
+          { headers: { Authorization: `Bearer ${publicAnonKey}` } }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Could not load ${store} products (${response.status})`);
+        }
+
+        const data = await response.json();
+        return Array.isArray(data.products) ? data.products as Omit<TrendingProduct, 'badge'>[] : [];
+      } catch (error) {
+        console.error(`Error loading ${store} products for homepage:`, error);
+        return [];
+      }
+    };
+
+    const loadTrendingProducts = async () => {
+      const [mainProducts, lingerieProducts] = await Promise.all([
+        loadStoreProducts('main'),
+        loadStoreProducts('lingerie')
+      ]);
+
+      if (!cancelled) {
+        const featuredProducts = Array.from({ length: 3 }, (_, index) => [
+          mainProducts[index] && { ...mainProducts[index], store: 'main' as const, badge: 'Adult Toys' },
+          lingerieProducts[index] && { ...lingerieProducts[index], store: 'lingerie' as const, badge: 'Lingerie' }
+        ]).flat().filter((product): product is TrendingProduct => Boolean(product));
+
+        setTrendingProducts(featuredProducts);
+        setIsTrendingLoading(false);
+      }
+    };
+
+    loadTrendingProducts();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Auto-scroll carousel
   useEffect(() => {
+    if (trendingProducts.length < 2) return;
+
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % trendingProducts.length);
     }, 4000); // Change slide every 4 seconds
@@ -195,6 +200,8 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
   }, [currentSlide, controls]);
 
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    if (trendingProducts.length < 2) return;
+
     const offset = info.offset.x;
     const velocity = info.velocity.x;
 
@@ -214,10 +221,12 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
   };
 
   const nextSlide = () => {
+    if (trendingProducts.length < 2) return;
     setCurrentSlide((prev) => (prev + 1) % trendingProducts.length);
   };
 
   const prevSlide = () => {
+    if (trendingProducts.length < 2) return;
     setCurrentSlide((prev) => (prev - 1 + trendingProducts.length) % trendingProducts.length);
   };
 
@@ -384,35 +393,35 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
               >
                 <Badge className="mb-4 text-sm px-4 py-2 shadow-lg">
                   <TrendingUp className="h-3 w-3 mr-1 animate-pulse" />
-                  Trending Now
+                  From Our Catalogue
                 </Badge>
               </motion.div>
-              <h2 className="mb-4">Discover What's Hot</h2>
+              <h2 className="mb-4">Explore Our Catalogue</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Our most popular products, loved by thousands of satisfied customers
+                A selection of products currently listed in our toys and lingerie collections
               </p>
             </div>
 
             {/* Carousel Container */}
             <div className="relative">
               {/* Navigation Arrows */}
-              <motion.button
+              {trendingProducts.length > 1 && <motion.button
                 className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-md hover:bg-background border-2 border-primary/30 rounded-full p-3 shadow-xl hover:shadow-2xl transition-all"
                 onClick={prevSlide}
                 whileHover={{ scale: 1.1, x: -5 }}
                 whileTap={{ scale: 0.9 }}
               >
                 <ChevronLeft className="h-6 w-6 text-primary" />
-              </motion.button>
+              </motion.button>}
 
-              <motion.button
+              {trendingProducts.length > 1 && <motion.button
                 className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-md hover:bg-background border-2 border-primary/30 rounded-full p-3 shadow-xl hover:shadow-2xl transition-all"
                 onClick={nextSlide}
                 whileHover={{ scale: 1.1, x: 5 }}
                 whileTap={{ scale: 0.9 }}
               >
                 <ChevronRight className="h-6 w-6 text-primary" />
-              </motion.button>
+              </motion.button>}
 
               {/* Carousel Track */}
               <div className="overflow-hidden mx-4 sm:mx-8 md:mx-12">
@@ -425,7 +434,11 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
                   animate={controls}
                   style={{ x: dragX }}
                 >
-                  {trendingProducts.map((product, index) => (
+                  {isTrendingLoading ? (
+                    <p className="w-full py-12 text-center text-muted-foreground">Loading catalogue products…</p>
+                  ) : trendingProducts.length === 0 ? (
+                    <p className="w-full py-12 text-center text-muted-foreground">No catalogue products are available right now.</p>
+                  ) : trendingProducts.map((product, index) => (
                     <motion.div
                       key={product.id}
                       className="min-w-[280px] sm:min-w-[300px] md:min-w-[320px]"
@@ -450,11 +463,17 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
                                 whileHover={{ scale: 1.15 }}
                                 transition={{ duration: 0.6, ease: "easeOut" }}
                               >
-                                <ImageWithFallback
-                                  src={product.image}
-                                  alt={product.name}
-                                  className="object-cover w-full h-full"
-                                />
+                                {product.image ? (
+                                  <ImageWithFallback
+                                    src={product.image}
+                                    alt={product.name}
+                                    className="object-cover w-full h-full"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground">
+                                    <Package className="h-10 w-10" aria-hidden="true" />
+                                  </div>
+                                )}
                               </motion.div>
                               
                               {/* Gradient Overlay */}
