@@ -97,20 +97,20 @@ function ProductTile({
           className="min-w-0 text-left"
           onClick={() => onViewProduct?.(product.id)}
         >
-          <p className="mb-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#a46a7d]">
+          <p className="homepage-product-meta mb-1 text-[10px] font-medium uppercase tracking-[0.18em]">
             {product.category}
           </p>
-          <h3 className="line-clamp-1 text-sm font-medium text-[#241e1e] sm:text-base">
+          <h3 className="homepage-product-name line-clamp-1 text-sm font-medium sm:text-base">
             {product.name}
           </h3>
-          <p className="mt-1.5 text-sm font-semibold text-[#241e1e]">{formatPrice(product.price)}</p>
+          <p className="homepage-product-price mt-1.5 text-sm font-semibold">{formatPrice(product.price)}</p>
         </button>
         <button
           type="button"
           aria-label={`Add ${product.name} to cart`}
           disabled={product.inStock === false}
           onClick={() => onAddToCart?.(product)}
-          className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-[#e8dadd] text-[#2a2022] transition hover:border-[#d8476d] hover:bg-[#d8476d] hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+          className="homepage-cart-button mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-[#e8dadd] text-[#2a2022] transition hover:border-[#d8476d] hover:bg-[#d8476d] hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
         >
           <ShoppingBag className="h-4 w-4" />
         </button>
@@ -310,7 +310,7 @@ export function HomePage({ onNavigate, onAddToCart, onViewProduct }: HomePagePro
         </div>
       </section>
 
-      <section className="border-b border-[#eee6e4] bg-white">
+      <section className="homepage-trust border-b">
         <div className="mx-auto grid max-w-7xl grid-cols-1 divide-y divide-[#eee6e4] px-6 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:px-8">
           {[
             { icon: LockKeyhole, title: 'Your privacy, protected', copy: 'Discreet packaging on every order' },
@@ -328,7 +328,8 @@ export function HomePage({ onNavigate, onAddToCart, onViewProduct }: HomePagePro
         </div>
       </section>
 
-      <section id="collections" className="mx-auto max-w-7xl px-6 py-16 sm:px-8 sm:py-24">
+      <section id="collections" className="homepage-collections">
+        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-8 sm:py-24">
         <SectionHeading
           eyebrow="A world of possibility"
           title="Find what feels like you."
@@ -362,6 +363,7 @@ export function HomePage({ onNavigate, onAddToCart, onViewProduct }: HomePagePro
               </span>
             </motion.button>
           ))}
+        </div>
         </div>
       </section>
 
@@ -410,7 +412,8 @@ export function HomePage({ onNavigate, onAddToCart, onViewProduct }: HomePagePro
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-16 sm:px-8 sm:py-24">
+      <section className="homepage-product-showcase">
+        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-8 sm:py-24">
         <div className="grid gap-16 lg:grid-cols-2 lg:gap-12">
           <div>
             <SectionHeading eyebrow="Worth discovering" title="Best sellers." />
@@ -445,6 +448,7 @@ export function HomePage({ onNavigate, onAddToCart, onViewProduct }: HomePagePro
             )}
           </div>
         </div>
+        </div>
       </section>
 
       <section className="homepage-contact relative overflow-hidden">
@@ -471,23 +475,39 @@ export function HomePage({ onNavigate, onAddToCart, onViewProduct }: HomePagePro
       </section>
       <style>{`
         .homepage-redesign { color: #241e1e; background: #fff; }
-        .homepage-hero { background: #f8f3f1; }
+        .homepage-hero { background: #f2d3dc; }
         .homepage-hero > div { display: grid; grid-template-columns: minmax(0, 1fr); }
         .homepage-hero-copy { order: 2; padding: 2.25rem 1.5rem 3rem; }
         .homepage-hero-art { order: 1; height: min(94vw, 560px); min-height: 360px; }
         .homepage-hero-title { color: #211b1b; font-size: clamp(2.65rem, 10vw, 6.6rem); line-height: .92; letter-spacing: -.065em; }
-        .homepage-accent { color: #bf6f86; }
+        .homepage-accent { color: #ca3d68; }
         .homepage-eyebrow { color: #805461; }
         .homepage-subcopy { color: #6e6263; font-size: 1rem; line-height: 1.8; }
-        .homepage-primary-cta { background: #241e1e !important; color: #fff !important; }
-        .homepage-primary-cta:hover { background: #d8476d !important; }
+        .homepage-primary-cta { background: #d8476d !important; color: #fff !important; }
+        .homepage-primary-cta:hover { background: #241e1e !important; }
         .homepage-secondary-cta { border: 1px solid #d8c8c8 !important; background: transparent !important; color: #241e1e !important; }
-        .homepage-secondary-cta:hover { border-color: #d8476d !important; background: #fff !important; }
+        .homepage-secondary-cta:hover { border-color: #d8476d !important; background: rgba(255,255,255,.55) !important; }
         .homepage-product-image { display: block; aspect-ratio: 4 / 5; }
         .homepage-category-image { display: block; aspect-ratio: .78; }
         .homepage-trending-item { width: 72vw; max-width: 285px; flex-shrink: 0; }
-        .homepage-trending { background: #f8f4f2; }
-        .homepage-contact { background: #f1e5e5; padding: 3.5rem 0; }
+        .homepage-trust { background: #241e1e; border-color: #51343d; color: #fff; }
+        .homepage-trust p:first-child { color: #fff; }
+        .homepage-trust p:last-child { color: #dfb5c0; }
+        .homepage-trust svg { color: #ef8ca8; }
+        .homepage-collections { background: #fff2f6; }
+        .homepage-trending { background: #f1ccd7; }
+        .homepage-product-showcase { background: #241e1e; color: #fff; }
+        .homepage-redesign .homepage-product-showcase h2 { color: #fff; }
+        .homepage-product-showcase .homepage-product-name,
+        .homepage-product-showcase .homepage-product-price { color: #fff; }
+        .homepage-product-showcase .homepage-product-meta { color: #e5aabc; }
+        .homepage-product-showcase .homepage-cart-button { border-color: #6a4651; color: #fff; }
+        .homepage-product-showcase .homepage-cart-button:hover { border-color: #d8476d; background: #d8476d; }
+        .homepage-contact { background: #d65b7b; color: #fff; padding: 3.5rem 0; }
+        .homepage-redesign .homepage-contact h2 { color: #fff; }
+        .homepage-redesign .homepage-contact p { color: #fff0f4; }
+        .homepage-contact .homepage-primary-cta { background: #241e1e !important; }
+        .homepage-contact .homepage-primary-cta:hover { background: #fff !important; color: #241e1e !important; }
         .homepage-redesign h2 { color: #211b1b; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(2rem, 4vw, 2.75rem); line-height: 1.12; letter-spacing: -.035em; }
         @media (min-width: 640px) {
           .homepage-hero-copy { padding: 2.5rem 2.5rem 3rem; }
