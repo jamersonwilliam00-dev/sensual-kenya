@@ -1,10 +1,12 @@
 import { useEffect, useState, useRef } from 'react';
-import { ArrowRight, Heart, Sparkles, Package, Shield, Truck, Star, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, Heart, Sparkles, Package, Shield, Truck, Star, TrendingUp, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
 import { motion, useMotionValue, useAnimation, PanInfo } from 'framer-motion';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Badge } from './ui/badge';
+import { ProductCard } from './ProductCard';
+import { projectId, publicAnonKey } from '../utils/supabase/info';
 
 interface HomePageProps {
   onNavigate: (section: string) => void;
@@ -105,654 +107,392 @@ function SparklesEffect() {
   );
 }
 
+interface CatalogProduct {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
+  image?: string;
+  description?: string;
+  inStock?: boolean;
+  store: 'main' | 'lingerie';
+}
+
 export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewProduct }: HomePageProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [trendingProducts, setTrendingProducts] = useState<CatalogProduct[]>([
+    { id: 'products:main:5', name: 'The Rabbit (New Model)', price: 2999, store: 'main', category: 'Vibrators', image: 'https://images.unsplash.com/photo-1625154253125-5d89afab6c7c?w=900', inStock: true },
+    { id: 'products:main:2', name: 'Mini Vibrating Panties', price: 2900, store: 'main', category: 'Vibrators', image: 'https://images.unsplash.com/photo-1625154253125-5d89afab6c7c?w=900', inStock: true },
+    { id: 'products:main:6', name: 'Luxury Massager', price: 3499, store: 'main', category: 'Massagers', image: 'https://images.unsplash.com/photo-1625154253125-5d89afab6c7c?w=900', inStock: true },
+    { id: 'products:lingerie:1', name: 'Candi Eros Lingerie', price: 999, store: 'lingerie', category: 'Sexy Lingerie', image: 'https://images.unsplash.com/photo-1591079496752-a56c5474af3f?w=900', inStock: true },
+    { id: 'products:lingerie:3', name: 'Sexy Floral Lace Bodysuit', price: 1600, store: 'lingerie', category: 'Sexy Lingerie', image: 'https://images.unsplash.com/photo-1591079496752-a56c5474af3f?w=900', inStock: true },
+    { id: 'products:lingerie:4', name: 'Satin Robe Set', price: 1299, store: 'lingerie', category: 'Sleepwear', image: 'https://images.unsplash.com/photo-1591079496752-a56c5474af3f?w=900', inStock: true }
+  ]);
+  const [bestSellers, setBestSellers] = useState<CatalogProduct[]>([]);
+  const [newArrivals, setNewArrivals] = useState<CatalogProduct[]>([]);
   const carouselRef = useRef<HTMLDivElement>(null);
   const dragX = useMotionValue(0);
   const controls = useAnimation();
+
+  const categoryCards = [
+    {
+      title: 'Sex Toys',
+      subtitle: 'Powerful essentials for deeper comfort and pleasure.',
+      image: 'https://images.unsplash.com/photo-1664347770836-03d04faa3c04?w=1200',
+      action: 'Shop Toys',
+      onClick: () => onNavigate('main-store')
+    },
+    {
+      title: 'Lingerie',
+      subtitle: 'Elegant silhouettes designed to feel beautiful.',
+      image: 'https://images.unsplash.com/photo-1591079496752-a56c5474af3f?w=1200',
+      action: 'Shop Lingerie',
+      onClick: () => onNavigate('lingerie-store')
+    },
+    {
+      title: "Couples' Products",
+      subtitle: 'Shared rituals and magnetic date-night finds.',
+      image: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=1200',
+      action: 'Explore Couples',
+      onClick: () => onNavigate('main-store')
+    },
+    {
+      title: 'Accessories',
+      subtitle: 'Thoughtful add-ons for a polished, elevated experience.',
+      image: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1200',
+      action: 'Browse Accessories',
+      onClick: () => onNavigate('main-store')
+    }
+  ];
+
+  const customerPerks = [
+    'Discreet nationwide delivery',
+    'M-Pesa friendly checkout',
+    '100% confidential shopping'
+  ];
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
-  const trendingProducts = [
-    {
-      id: 'products:main:5',
-      name: 'The Rabbit (New Model)',
-      price: 2999,
-      store: 'main',
-      category: 'Vibrators',
-      image: 'https://images.unsplash.com/photo-1625154253125-5d89afab6c7c?w=400',
-      badge: 'Trending'
-    },
-    {
-      id: 'products:lingerie:1',
-      name: 'Candi Eros Lingerie',
-      price: 999,
-      store: 'lingerie',
-      category: 'Sexy Lingerie',
-      image: 'https://images.unsplash.com/photo-1591079496752-a56c5474af3f?w=400',
-      badge: 'Popular'
-    },
-    {
-      id: 'products:main:2',
-      name: 'Mini Vibrating Panties',
-      price: 2900,
-      store: 'main',
-      category: 'Vibrators',
-      image: 'https://images.unsplash.com/photo-1625154253125-5d89afab6c7c?w=400',
-      badge: 'New'
-    },
-    {
-      id: 'products:lingerie:3',
-      name: 'Sexy Floral Lace Bodysuit',
-      price: 1600,
-      store: 'lingerie',
-      category: 'Sexy Lingerie',
-      image: 'https://images.unsplash.com/photo-1591079496752-a56c5474af3f?w=400',
-      badge: 'Hot'
-    },
-    {
-      id: 'products:main:6',
-      name: 'Luxury Massager',
-      price: 3499,
-      store: 'main',
-      category: 'Massagers',
-      image: 'https://images.unsplash.com/photo-1625154253125-5d89afab6c7c?w=400',
-      badge: 'Premium'
-    },
-    {
-      id: 'products:lingerie:4',
-      name: 'Satin Robe Set',
-      price: 1299,
-      store: 'lingerie',
-      category: 'Sleepwear',
-      image: 'https://images.unsplash.com/photo-1591079496752-a56c5474af3f?w=400',
-      badge: 'Bestseller'
-    }
-  ];
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const [mainResponse, lingerieResponse] = await Promise.all([
+          fetch(`https://${projectId}.supabase.co/functions/v1/make-server-afd25991/products?store=main`, {
+            headers: { Authorization: `Bearer ${publicAnonKey}` }
+          }),
+          fetch(`https://${projectId}.supabase.co/functions/v1/make-server-afd25991/products?store=lingerie`, {
+            headers: { Authorization: `Bearer ${publicAnonKey}` }
+          })
+        ]);
 
-  // Auto-scroll carousel
+        const mainProducts = mainResponse.ok ? (await mainResponse.json()).products || [] : [];
+        const lingerieProducts = lingerieResponse.ok ? (await lingerieResponse.json()).products || [] : [];
+        const allProducts: CatalogProduct[] = [...mainProducts, ...lingerieProducts];
+
+        if (allProducts.length > 0) {
+          const featured = allProducts.slice(0, 8);
+          setTrendingProducts(featured);
+          setBestSellers([...allProducts].sort((a, b) => Number(b.price) - Number(a.price)).slice(0, 4));
+          setNewArrivals(allProducts.slice(-4));
+        }
+      } catch (error) {
+        console.error('Error loading homepage products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % trendingProducts.length);
-    }, 4000); // Change slide every 4 seconds
+      setCurrentSlide((prev) => (prev + 1) % Math.max(trendingProducts.length, 1));
+    }, 4000);
 
     return () => clearInterval(interval);
   }, [trendingProducts.length]);
 
-  // Smooth scroll to current slide
   useEffect(() => {
-    controls.start({
-      x: -currentSlide * (320 + 24), // card width + gap
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 30
-      }
-    });
-  }, [currentSlide, controls]);
+    if (trendingProducts.length > 0) {
+      controls.start({
+        x: -currentSlide * (320 + 24),
+        transition: {
+          type: 'spring',
+          stiffness: 260,
+          damping: 28
+        }
+      });
+    }
+  }, [currentSlide, controls, trendingProducts.length]);
 
-  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+  const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const offset = info.offset.x;
     const velocity = info.velocity.x;
 
     if (Math.abs(velocity) > 500 || Math.abs(offset) > 100) {
       if (offset > 0) {
-        // Dragged right, go to previous
         setCurrentSlide((prev) => (prev - 1 + trendingProducts.length) % trendingProducts.length);
       } else {
-        // Dragged left, go to next
         setCurrentSlide((prev) => (prev + 1) % trendingProducts.length);
       }
     }
   };
 
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index);
-  };
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % trendingProducts.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + trendingProducts.length) % trendingProducts.length);
-  };
+  const goToSlide = (index: number) => setCurrentSlide(index);
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % trendingProducts.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + trendingProducts.length) % trendingProducts.length);
 
   return (
-    <div className="min-h-screen bg-background overflow-hidden">
-      {/* Hero Section - World Class */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background with Parallax Effect */}
-        <motion.div 
-          className="absolute inset-0"
-          initial={{ scale: 1.1 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-        >
-          <div 
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: `url(https://images.unsplash.com/photo-1717517828262-9a326f3289ac?w=1600)`,
-            }}
-          />
-          {/* Gradient Overlays */}
-          <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-pink-900/60 to-black/90" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-        </motion.div>
-
-        {/* Floating Effects */}
-        <FloatingHearts />
-        <SparklesEffect />
-
-        {/* Hero Content */}
-        <div className="relative z-10 container mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 30 }}
-            transition={{ duration: 1, delay: 0.2 }}
-          >
-            {/* Glowing Title */}
-            <h1 
-              className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl text-white mb-4 md:mb-6 drop-shadow-2xl px-2"
-              style={{
-                textShadow: '0 0 40px rgba(236, 72, 153, 0.5), 0 0 80px rgba(236, 72, 153, 0.3)',
-                fontWeight: 600,
-                letterSpacing: '-0.02em'
-              }}
-            >
-              Elevate Your Intimate Moments
-            </h1>
-          </motion.div>
-
-          <motion.p
-            className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 mb-8 md:mb-12 max-w-3xl mx-auto drop-shadow-lg px-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-            transition={{ duration: 1, delay: 0.4 }}
-          >
-            Discover Kenya's most trusted destination for sensual wellness, intimate products, and elegant lingerie.
-          </motion.p>
-
-          {/* CTA Buttons */}
-          <motion.div
-            className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center mb-12 md:mb-16 px-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-            transition={{ duration: 1, delay: 0.6 }}
-          >
+    <div className="min-h-screen overflow-hidden bg-[#f8f5f3] text-slate-900">
+      <section className="relative overflow-hidden bg-white">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(236,72,153,0.12),_transparent_38%),radial-gradient(circle_at_bottom_right,_rgba(15,23,42,0.08),_transparent_30%)]" />
+        <div className="relative z-10 mx-auto flex min-h-[760px] max-w-7xl items-center px-4 py-8 sm:px-6 lg:px-8">
+          <div className="grid w-full items-center gap-12 lg:grid-cols-[1.05fr_1.2fr]">
             <motion.div
-              whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(236, 72, 153, 0.6)" }}
-              whileTap={{ scale: 0.95 }}
-              className="w-full sm:w-auto"
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 24 }}
+              transition={{ duration: 0.8 }}
+              className="mx-auto w-full max-w-xl lg:mx-0"
             >
-              <Button 
-                size="lg" 
-                className="w-full sm:w-auto text-base md:text-lg px-6 md:px-8 py-5 md:py-6 bg-gradient-to-r from-pink-600 to-pink-500 hover:from-pink-500 hover:to-pink-400 shadow-2xl"
-                onClick={() => onNavigate('main-store')}
-              >
-                <Heart className="mr-2 h-4 w-4 md:h-5 md:w-5" />
-                Shop Adult Toys
-              </Button>
-            </motion.div>
+              <Badge className="mb-5 border-pink-200 bg-pink-50 text-pink-700 shadow-sm">
+                <Sparkles className="mr-2 h-3.5 w-3.5" />
+                Premium pleasure, beautifully curated
+              </Badge>
 
-            <motion.div
-              whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(236, 72, 153, 0.6)" }}
-              whileTap={{ scale: 0.95 }}
-              className="w-full sm:w-auto"
-            >
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="w-full sm:w-auto text-base md:text-lg px-6 md:px-8 py-5 md:py-6 bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20"
-                onClick={() => onNavigate('lingerie-store')}
-              >
-                <Sparkles className="mr-2 h-4 w-4 md:h-5 md:w-5" />
-                Browse Lingerie
-              </Button>
-            </motion.div>
-          </motion.div>
+              <h1 className="mb-5 text-4xl font-semibold tracking-[-0.05em] text-slate-950 sm:text-5xl lg:text-[4.2rem] leading-[0.95]">
+                Intimate essentials for every moment.
+              </h1>
 
-          {/* Trust Badge with Animated Counter */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: isVisible ? 1 : 0, scale: isVisible ? 1 : 0.8 }}
-            transition={{ duration: 1, delay: 0.8 }}
-            className="inline-block px-4"
-          >
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-4 sm:px-6 md:px-8 py-4 md:py-6 shadow-2xl">
-              <motion.div
-                animate={{
-                  boxShadow: [
-                    "0 0 20px rgba(236, 72, 153, 0.3)",
-                    "0 0 40px rgba(236, 72, 153, 0.5)",
-                    "0 0 20px rgba(236, 72, 153, 0.3)"
-                  ]
-                }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                <p className="text-white/70 text-xs sm:text-sm mb-2">Trusted by</p>
-                <div className="flex items-center gap-1 md:gap-2 justify-center">
-                  {[...Array(5)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 1 + i * 0.1 }}
-                    >
-                      <Star className="h-4 w-4 md:h-5 md:w-5 text-yellow-400 fill-yellow-400" />
-                    </motion.div>
-                  ))}
-                </div>
-                <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-white mt-2" style={{ fontWeight: 700 }}>
-                  <AnimatedCounter target={10000} /> Happy Customers
-                </p>
-              </motion.div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center pt-2">
-            <div className="w-1 h-3 bg-white/50 rounded-full" />
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Trending Products - Horizontal Carousel */}
-      <section className="py-20 overflow-hidden">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <div className="text-center mb-12">
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                whileInView={{ scale: 1, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-              >
-                <Badge className="mb-4 text-sm px-4 py-2 shadow-lg">
-                  <TrendingUp className="h-3 w-3 mr-1 animate-pulse" />
-                  Trending Now
-                </Badge>
-              </motion.div>
-              <h2 className="mb-4">Discover What's Hot</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Our most popular products, loved by thousands of satisfied customers
+              <p className="mb-8 max-w-lg text-lg leading-relaxed text-slate-600">
+                Discover premium sex toys, elegant lingerie, and thoughtful couple's favourites designed for confidence, comfort, and connection.
               </p>
-            </div>
 
-            {/* Carousel Container */}
-            <div className="relative">
-              {/* Navigation Arrows */}
-              <motion.button
-                className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-md hover:bg-background border-2 border-primary/30 rounded-full p-3 shadow-xl hover:shadow-2xl transition-all"
-                onClick={prevSlide}
-                whileHover={{ scale: 1.1, x: -5 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <ChevronLeft className="h-6 w-6 text-primary" />
-              </motion.button>
-
-              <motion.button
-                className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-md hover:bg-background border-2 border-primary/30 rounded-full p-3 shadow-xl hover:shadow-2xl transition-all"
-                onClick={nextSlide}
-                whileHover={{ scale: 1.1, x: 5 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <ChevronRight className="h-6 w-6 text-primary" />
-              </motion.button>
-
-              {/* Carousel Track */}
-              <div className="overflow-hidden mx-4 sm:mx-8 md:mx-12">
-                <motion.div
-                  ref={carouselRef}
-                  className="flex gap-4 md:gap-6"
-                  drag="x"
-                  dragConstraints={{ left: -1600, right: 0 }}
-                  onDragEnd={handleDragEnd}
-                  animate={controls}
-                  style={{ x: dragX }}
+              <div className="mb-8 flex flex-col gap-4 sm:flex-row">
+                <Button
+                  size="lg"
+                  className="gap-2 bg-slate-950 px-6 py-6 text-base text-white shadow-lg shadow-slate-900/10 hover:bg-slate-800"
+                  onClick={() => onNavigate('main-store')}
                 >
-                  {trendingProducts.map((product, index) => (
-                    <motion.div
-                      key={product.id}
-                      className="min-w-[280px] sm:min-w-[300px] md:min-w-[320px]"
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: index * 0.1 }}
-                    >
-                      <motion.div
-                        whileHover={{ y: -10, scale: 1.02 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <Card 
-                          className="group overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer border-2 border-transparent hover:border-primary/50 bg-card/50 backdrop-blur-sm"
-                          onClick={() => onViewProduct?.(product.id)}
-                        >
-                          <CardContent className="p-0">
-                            <div className="relative aspect-square overflow-hidden">
-                              {/* Image Container */}
-                              <motion.div
-                                className="w-full h-full"
-                                whileHover={{ scale: 1.15 }}
-                                transition={{ duration: 0.6, ease: "easeOut" }}
-                              >
-                                <ImageWithFallback
-                                  src={product.image}
-                                  alt={product.name}
-                                  className="object-cover w-full h-full"
-                                />
-                              </motion.div>
-                              
-                              {/* Gradient Overlay */}
-                              <motion.div 
-                                className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"
-                                initial={{ opacity: 0 }}
-                                whileHover={{ opacity: 1 }}
-                                transition={{ duration: 0.3 }}
-                              />
-                              
-                              {/* Badge */}
-                              <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                transition={{ delay: 0.2 + index * 0.1, type: "spring" }}
-                              >
-                                <Badge className="absolute top-3 right-3 shadow-xl backdrop-blur-sm bg-primary/90 animate-pulse">
-                                  {product.badge}
-                                </Badge>
-                              </motion.div>
-
-                              {/* Quick View Button */}
-                              <motion.div
-                                className="absolute bottom-3 left-3 right-3"
-                                initial={{ opacity: 0, y: 20 }}
-                                whileHover={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3 }}
-                              >
-                                <Button 
-                                  size="sm" 
-                                  className="w-full shadow-xl backdrop-blur-sm"
-                                  variant="secondary"
-                                >
-                                  Quick View
-                                </Button>
-                              </motion.div>
-                            </div>
-                            
-                            {/* Product Info */}
-                            <div className="p-4 bg-gradient-to-b from-card to-card/80">
-                              <h4 className="mb-2 line-clamp-1">{product.name}</h4>
-                              <div className="flex items-center justify-between">
-                                <p className="text-primary" style={{ fontSize: '1.125rem', fontWeight: 600 }}>
-                                  KSh {product.price.toLocaleString()}
-                                </p>
-                                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                                  <Button 
-                                    size="icon"
-                                    variant="ghost"
-                                    className="h-8 w-8 rounded-full bg-primary/10 hover:bg-primary hover:text-white"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      if (onAddToCart) {
-                                        onAddToCart(product);
-                                      }
-                                    }}
-                                  >
-                                    <Heart className="h-4 w-4" />
-                                  </Button>
-                                </motion.div>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    </motion.div>
-                  ))}
-                </motion.div>
+                  <Heart className="h-4 w-4 fill-pink-500 text-pink-500" />
+                  Shop sex toys
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-slate-200 bg-white px-6 py-6 text-base text-slate-900 shadow-sm hover:border-pink-300 hover:text-pink-700"
+                  onClick={() => onNavigate('lingerie-store')}
+                >
+                  <Sparkles className="h-4 w-4 text-pink-500" />
+                  Browse lingerie
+                </Button>
               </div>
 
-              {/* Dot Indicators */}
-              <div className="flex justify-center gap-2 mt-8">
-                {trendingProducts.map((_, index) => (
-                  <motion.button
-                    key={index}
-                    className={`h-2 rounded-full transition-all ${
-                      index === currentSlide 
-                        ? 'w-8 bg-primary' 
-                        : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50'
-                    }`}
-                    onClick={() => goToSlide(index)}
-                    whileHover={{ scale: 1.2 }}
-                    whileTap={{ scale: 0.9 }}
-                    animate={{
-                      scale: index === currentSlide ? 1.1 : 1,
-                    }}
-                  />
+              <div className="mb-8 flex flex-wrap gap-3">
+                {customerPerks.map((perk) => (
+                  <div key={perk} className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm">
+                    {perk}
+                  </div>
                 ))}
               </div>
+
+              <div className="flex items-center gap-4 rounded-[28px] border border-slate-200 bg-white p-4 shadow-[0_20px_50px_rgba(15,23,42,0.06)]">
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <div>
+                  <p className="text-2xl font-semibold text-slate-950"><AnimatedCounter target={10000} /></p>
+                  <p className="text-sm text-slate-500">happy customers</p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 32 }}
+              animate={{ opacity: isVisible ? 1 : 0, x: isVisible ? 0 : 32 }}
+              transition={{ duration: 0.9, delay: 0.2 }}
+              className="relative"
+            >
+              <div className="relative overflow-hidden rounded-[32px] border border-slate-200 bg-white p-3 shadow-[0_40px_80px_rgba(15,23,42,0.12)]">
+                <div className="grid gap-3 sm:grid-cols-[1.2fr_0.8fr]">
+                  <div className="relative overflow-hidden rounded-[24px]">
+                    <ImageWithFallback
+                      src="https://images.unsplash.com/photo-1664347770836-03d04faa3c04?w=1200"
+                      alt="Sensual Kenya intimate product collection"
+                      className="h-[430px] w-full rounded-[24px] object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 to-transparent" />
+                    <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.2em] text-pink-200">Featured</p>
+                        <h3 className="mt-2 text-2xl font-semibold text-white">Premium toys</h3>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="bg-white text-slate-900 hover:bg-pink-50"
+                        onClick={() => onNavigate('main-store')}
+                      >
+                        Shop now
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <div className="overflow-hidden rounded-[24px]">
+                      <ImageWithFallback
+                        src="https://images.unsplash.com/photo-1591079496752-a56c5474af3f?w=1200"
+                        alt="Sensual Kenya lingerie selection"
+                        className="h-[210px] w-full rounded-[24px] object-cover"
+                      />
+                    </div>
+                    <div className="rounded-[24px] bg-slate-950 p-4 text-white">
+                      <p className="mb-2 text-xs uppercase tracking-[0.2em] text-pink-200">New</p>
+                      <h3 className="mb-1 text-2xl font-semibold">Luxe lingerie</h3>
+                      <p className="mb-4 text-sm text-slate-300">Soft fabrics. Beautiful silhouettes.</p>
+                      <Button
+                        variant="secondary"
+                        className="bg-white text-slate-900 hover:bg-pink-50"
+                        onClick={() => onNavigate('lingerie-store')}
+                      >
+                        View collection
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="absolute -bottom-8 -left-8 rounded-full border border-pink-200 bg-pink-50 px-5 py-3 text-sm font-medium text-pink-700 shadow-lg shadow-pink-100">
+                ✨ Discreet delivery across Kenya
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
+            <div className="mb-10 flex flex-col items-center justify-center text-center">
+              <Badge className="mb-4 border-pink-200 bg-pink-50 text-pink-700 shadow-sm">
+                <TrendingUp className="mr-2 h-3.5 w-3.5" />
+                Trending now
+              </Badge>
+              <h2 className="mb-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950 sm:text-4xl">Best-loved picks this week</h2>
+              <p className="max-w-2xl text-lg text-slate-600">Curated favourites from our most-loved adult toys and lingerie collections.</p>
             </div>
           </motion.div>
-        </div>
-      </section>
 
-      {/* Category Showcase with Background Images */}
-      <section className="container mx-auto px-4 py-20">
-        <motion.h2
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          Explore Our Collections
-        </motion.h2>
-        
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Adult Toys Card */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            whileHover={{ scale: 1.02 }}
-          >
-            <Card 
-              className="group cursor-pointer overflow-hidden hover:shadow-2xl transition-all duration-500 h-[400px]"
-              onClick={() => onNavigate('main-store')}
+          <div className="relative">
+            <motion.button
+              className="absolute left-0 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-slate-200 bg-white p-3 shadow-lg shadow-slate-200/60 md:block"
+              onClick={prevSlide}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <CardContent className="p-0 h-full">
-                <div className="relative h-full overflow-hidden">
-                  <motion.div
-                    className="absolute inset-0"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    <div
-                      className="absolute inset-0 bg-cover bg-center"
-                      style={{
-                        backgroundImage: `url(https://images.unsplash.com/photo-1664347770836-03d04faa3c04?w=1200)`
-                      }}
-                    />
-                  </motion.div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
-                  <div className="absolute bottom-6 left-6 right-6 text-white">
-                    <motion.h3 
-                      className="mb-4 drop-shadow-lg relative"
-                      initial={{ opacity: 0, y: 10 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      style={{
-                        background: 'linear-gradient(135deg, #ec4899 0%, #f472b6 50%, #fbbf24 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        backgroundClip: 'text',
-                        fontWeight: 700,
-                        textShadow: '0 0 20px rgba(236, 72, 153, 0.4)',
-                      }}
-                    >
-                      Go to Adult Toys Section
-                    </motion.h3>
-                    <div className="flex gap-2">
-                      <motion.div 
-                        whileHover={{ scale: 1.08, y: -3 }} 
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Button 
-                          variant="secondary" 
-                          className="gap-2 shadow-xl relative overflow-hidden"
-                        >
-                          <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                            animate={{
-                              x: ['-100%', '100%']
-                            }}
-                            transition={{
-                              duration: 2,
-                              repeat: Infinity,
-                              repeatDelay: 1
-                            }}
-                          />
-                          <span className="relative z-10">Shop Now</span>
-                          <ArrowRight className="h-4 w-4 relative z-10" />
-                        </Button>
-                      </motion.div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+              <ChevronLeft className="h-5 w-5 text-slate-900" />
+            </motion.button>
 
-          {/* Lingerie Card */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            whileHover={{ scale: 1.02 }}
-          >
-            <Card 
-              className="group cursor-pointer overflow-hidden hover:shadow-2xl transition-all duration-500 h-[400px]"
-              onClick={() => onNavigate('lingerie-store')}
+            <motion.button
+              className="absolute right-0 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-slate-200 bg-white p-3 shadow-lg shadow-slate-200/60 md:block"
+              onClick={nextSlide}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <CardContent className="p-0 h-full">
-                <div className="relative h-full overflow-hidden">
-                  <motion.div
-                    className="absolute inset-0"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    <div
-                      className="absolute inset-0 bg-cover bg-center"
-                      style={{
-                        backgroundImage: `url(https://images.unsplash.com/photo-1668191219162-b58465065deb?w=1200)`
-                      }}
-                    />
-                  </motion.div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
-                  <div className="absolute bottom-6 left-6 right-6 text-white">
-                    <motion.h3 
-                      className="mb-4 drop-shadow-lg relative"
-                      initial={{ opacity: 0, y: 10 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      style={{
-                        background: 'linear-gradient(135deg, #ec4899 0%, #f472b6 50%, #fbbf24 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        backgroundClip: 'text',
-                        fontWeight: 700,
-                        textShadow: '0 0 20px rgba(236, 72, 153, 0.4)',
-                      }}
-                    >
-                      Go to Lingerie and Pajamas Section
-                    </motion.h3>
-                    <div className="flex gap-2">
-                      <motion.div 
-                        whileHover={{ scale: 1.08, y: -3 }} 
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Button 
-                          variant="secondary" 
-                          className="gap-2 shadow-xl relative overflow-hidden"
-                        >
-                          <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                            animate={{
-                              x: ['-100%', '100%']
-                            }}
-                            transition={{
-                              duration: 2,
-                              repeat: Infinity,
-                              repeatDelay: 1
-                            }}
-                          />
-                          <span className="relative z-10">Shop Now</span>
-                          <ArrowRight className="h-4 w-4 relative z-10" />
-                        </Button>
-                      </motion.div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-      </section>
+              <ChevronRight className="h-5 w-5 text-slate-900" />
+            </motion.button>
 
-      {/* Features Section */}
-      <section className="bg-gradient-to-br from-pink-600/10 via-purple-600/10 to-pink-600/10 py-20">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Package,
-                title: 'Discreet Packaging',
-                description: 'Plain, unmarked packaging for your complete privacy'
-              },
-              {
-                icon: Shield,
-                title: 'Secure Payments',
-                description: 'Safe and secure M-Pesa payment processing'
-              },
-              {
-                icon: Truck,
-                title: 'Fast Delivery',
-                description: '1-2 business days delivery across Kenya'
-              }
-            ].map((feature, index) => (
+            <div className="overflow-hidden px-2 pb-8 md:px-10">
               <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ y: -5 }}
+                ref={carouselRef}
+                className="flex gap-5"
+                drag="x"
+                dragConstraints={{ left: -1600, right: 0 }}
+                onDragEnd={handleDragEnd}
+                animate={controls}
+                style={{ x: dragX }}
               >
-                <Card className="text-center p-8 hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-primary/30">
+                {trendingProducts.map((product, index) => (
+                  <motion.div
+                    key={product.id}
+                    className="min-w-[270px] sm:min-w-[290px] md:min-w-[320px]"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.05 }}
+                  >
+                    <Card className="group overflow-hidden border border-slate-200 bg-white shadow-[0_20px_45px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_25px_50px_rgba(236,72,153,0.14)]">
+                      <CardContent className="p-0">
+                        <div className="relative overflow-hidden">
+                          <ImageWithFallback
+                            src={product.image || 'https://images.unsplash.com/photo-1625154253125-5d89afab6c7c?w=900'}
+                            alt={product.name}
+                            className="aspect-[4/5] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                          <Badge className="absolute right-3 top-3 border-0 bg-white/90 text-slate-900 shadow-sm backdrop-blur-sm">
+                            {product.category}
+                          </Badge>
+                        </div>
+                        <div className="p-4">
+                          <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.18em] text-pink-600">Sensual Kenya</p>
+                          <h3 className="mb-3 line-clamp-2 min-h-[3rem] text-xl font-medium text-slate-900">{product.name}</h3>
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="text-xl font-semibold text-slate-950">KSh {Number(product.price).toLocaleString()}</p>
+                            <Button
+                              size="sm"
+                              className="bg-slate-950 text-white hover:bg-slate-800"
+                              onClick={() => onAddToCart?.(product)}
+                            >
+                              Add
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+          </div>
+
+          <div className="mt-6 flex justify-center gap-2">
+            {trendingProducts.map((_, index) => (
+              <button
+                key={index}
+                aria-label={`Go to slide ${index + 1}`}
+                className={`h-2.5 rounded-full transition-all ${index === currentSlide ? 'w-8 bg-slate-950' : 'w-2.5 bg-slate-300 hover:bg-slate-400'}`}
+                onClick={() => goToSlide(index)}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} className="mb-10 text-center">
+            <Badge className="mb-4 border-pink-200 bg-pink-50 text-pink-700 shadow-sm">Curated collections</Badge>
+            <h2 className="text-3xl font-semibold tracking-[-0.04em] text-slate-950 sm:text-4xl">Shop by category</h2>
+          </motion.div>
+
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {categoryCards.map((category, index) => (
+              <motion.div key={category.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: index * 0.1 }}>
+                <Card className="group cursor-pointer overflow-hidden border border-slate-200 bg-white shadow-[0_20px_45px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_25px_50px_rgba(236,72,153,0.12)]" onClick={category.onClick}>
                   <CardContent className="p-0">
-                    <motion.div
-                      className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4"
-                      whileHover={{ rotate: 360, scale: 1.1 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <feature.icon className="h-8 w-8 text-primary" />
-                    </motion.div>
-                    <h3 className="mb-2">{feature.title}</h3>
-                    <p className="text-muted-foreground">{feature.description}</p>
+                    <div className="relative h-[360px] overflow-hidden">
+                      <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style={{ backgroundImage: `url(${category.image})` }} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+                      <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+                        <p className="mb-2 text-[11px] uppercase tracking-[0.2em] text-pink-200">Collection</p>
+                        <h3 className="mb-2 text-2xl font-semibold">{category.title}</h3>
+                        <p className="mb-4 text-sm text-slate-200">{category.subtitle}</p>
+                        <Button variant="secondary" className="bg-white text-slate-900 hover:bg-pink-50" onClick={(event) => { event.stopPropagation(); category.onClick(); }}>
+                          {category.action}
+                        </Button>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -761,108 +501,75 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
         </div>
       </section>
 
-      {/* CTA Section - Romantic Setting */}
-      <section className="relative py-32 overflow-hidden">
-        <motion.div
-          className="absolute inset-0"
-          initial={{ scale: 1.1 }}
-          whileInView={{ scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.5 }}
-        >
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: `url(https://images.unsplash.com/photo-1760067538083-b9d87cd6706c?w=1600)`
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-pink-900/70 to-black/80" />
-        </motion.div>
+      <section className="bg-white py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-10 lg:grid-cols-2">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
+              <div className="mb-8 flex items-center gap-3">
+                <Badge className="border-pink-200 bg-pink-50 text-pink-700 shadow-sm">Best sellers</Badge>
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2">
+                {bestSellers.map((product) => (
+                  <ProductCard key={product.id} product={product} onAddToCart={(item) => onAddToCart?.(item)} onViewProduct={onViewProduct} />
+                ))}
+              </div>
+            </motion.div>
 
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <motion.div whileHover={{ scale: 1.08, y: -5 }} whileTap={{ scale: 0.95 }}>
-                <Button 
-                  size="lg" 
-                  className="gap-2 px-10 py-7 text-lg shadow-2xl relative overflow-hidden"
-                  style={{
-                    background: 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)',
-                  }}
-                  onClick={() => onNavigate('blog')}
-                >
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                    animate={{
-                      x: ['-100%', '100%']
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      repeatDelay: 1
-                    }}
-                  />
-                  <Sparkles className="h-5 w-5 relative z-10" />
-                  <span className="relative z-10">Read Blogs</span>
-                </Button>
-              </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7, delay: 0.1 }}>
+              <div className="mb-8 flex items-center gap-3">
+                <Badge className="border-pink-200 bg-pink-50 text-pink-700 shadow-sm">New arrivals</Badge>
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2">
+                {newArrivals.map((product) => (
+                  <ProductCard key={product.id} product={product} onAddToCart={(item) => onAddToCart?.(item)} onViewProduct={onViewProduct} />
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
-              <motion.div whileHover={{ scale: 1.08, y: -5 }} whileTap={{ scale: 0.95 }}>
-                <Button 
-                  size="lg" 
-                  className="gap-2 px-10 py-7 text-lg shadow-2xl relative overflow-hidden"
-                  style={{
-                    background: 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)',
-                  }}
-                  onClick={() => onNavigate('contact')}
-                >
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                    animate={{
-                      x: ['-100%', '100%']
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      repeatDelay: 1.5
-                    }}
-                  />
-                  <Heart className="h-5 w-5 relative z-10" />
-                  <span className="relative z-10">Contact Us</span>
-                </Button>
-              </motion.div>
-
-              <motion.div whileHover={{ scale: 1.08, y: -5 }} whileTap={{ scale: 0.95 }}>
-                <Button 
-                  size="lg" 
-                  className="gap-2 px-10 py-7 text-lg shadow-2xl relative overflow-hidden"
-                  style={{
-                    background: 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)',
-                  }}
-                  onClick={() => onShowAuth()}
-                >
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                    animate={{
-                      x: ['-100%', '100%']
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      repeatDelay: 2
-                    }}
-                  />
-                  <ArrowRight className="h-5 w-5 relative z-10" />
-                  <span className="relative z-10">Post Blogs</span>
-                </Button>
-              </motion.div>
+      <section className="bg-gradient-to-r from-slate-950 via-slate-900 to-pink-950 py-20 text-white">
+        <div className="mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
+            <div className="mb-5 inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 p-3 text-pink-200">
+              <MessageCircle className="h-5 w-5" />
+            </div>
+            <h2 className="mb-4 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">Need a little guidance?</h2>
+            <p className="mx-auto max-w-2xl text-lg text-slate-200">Please feel free to contact us for any product enquiries or further information.</p>
+            <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+              <Button className="bg-white text-slate-950 hover:bg-pink-50" onClick={() => onNavigate('contact')}>
+                Contact us
+              </Button>
+              <Button variant="outline" className="border-white/20 bg-white/5 text-white hover:bg-white/10" onClick={() => onNavigate('blog')}>
+                Read our blog
+              </Button>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      <section className="py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-6 md:grid-cols-3">
+            {[
+              { icon: Package, title: 'Discreet packaging', description: 'Private, secure delivery to keep your order confidential.' },
+              { icon: Shield, title: 'Secure checkout', description: 'Trusted payment options with a smooth, safe shopping experience.' },
+              { icon: Truck, title: 'Fast delivery', description: 'National delivery with quick turnaround times across Kenya.' }
+            ].map((feature, index) => (
+              <motion.div key={feature.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: index * 0.08 }}>
+                <Card className="h-full border border-slate-200 bg-white shadow-[0_20px_45px_rgba(15,23,42,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_25px_50px_rgba(236,72,153,0.10)]">
+                  <CardContent className="flex h-full flex-col items-center p-8 text-center">
+                    <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-pink-50 text-pink-600">
+                      <feature.icon className="h-7 w-7" />
+                    </div>
+                    <h3 className="mb-3 text-xl font-semibold text-slate-950">{feature.title}</h3>
+                    <p className="text-slate-600">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
     </div>
