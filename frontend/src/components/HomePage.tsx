@@ -1,111 +1,21 @@
-import { useEffect, useState, useRef } from 'react';
-import { ArrowRight, Heart, Sparkles, Package, Shield, Truck, Star, TrendingUp, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
-import { motion, useMotionValue, useAnimation, PanInfo } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import {
+  ArrowDown,
+  ArrowRight,
+  ArrowUpRight,
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  LockKeyhole,
+  ShieldCheck,
+  ShoppingBag,
+  Sparkles,
+  Truck
+} from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Button } from './ui/button';
-import { Card, CardContent } from './ui/card';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Badge } from './ui/badge';
-import { ProductCard } from './ProductCard';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
-
-interface HomePageProps {
-  onNavigate: (section: string) => void;
-  isAdmin: boolean;
-  onShowAuth: () => void;
-  onAddToCart?: (product: any) => void;
-  onViewProduct?: (productId: string) => void;
-}
-
-// Animated Counter Component
-function AnimatedCounter({ target }: { target: number }) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    const duration = 2000;
-    const increment = target / (duration / 16);
-    let current = 0;
-    
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= target) {
-        setCount(target);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(current));
-      }
-    }, 16);
-
-    return () => clearInterval(timer);
-  }, [target]);
-
-  return <span>{count.toLocaleString()}+</span>;
-}
-
-// Floating Hearts Animation
-function FloatingHearts() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(15)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute text-pink-500/20"
-          initial={{ 
-            x: Math.random() * window.innerWidth,
-            y: window.innerHeight + 50,
-            scale: Math.random() * 0.5 + 0.5,
-            rotate: Math.random() * 360
-          }}
-          animate={{
-            y: -100,
-            x: Math.random() * window.innerWidth,
-            rotate: Math.random() * 360 + 360
-          }}
-          transition={{
-            duration: Math.random() * 10 + 15,
-            repeat: Infinity,
-            delay: Math.random() * 5,
-            ease: "linear"
-          }}
-        >
-          <Heart className="h-6 w-6 fill-current" />
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
-// Sparkles Effect
-function SparklesEffect() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(20)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute"
-          initial={{ 
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-            opacity: 0,
-            scale: 0
-          }}
-          animate={{
-            opacity: [0, 1, 0],
-            scale: [0, 1, 0],
-            rotate: [0, 180, 360]
-          }}
-          transition={{
-            duration: Math.random() * 3 + 2,
-            repeat: Infinity,
-            delay: Math.random() * 3,
-            ease: "easeInOut"
-          }}
-        >
-          <Sparkles className="h-4 w-4 text-pink-400" />
-        </motion.div>
-      ))}
-    </div>
-  );
-}
 
 interface CatalogProduct {
   id: string;
@@ -116,68 +26,107 @@ interface CatalogProduct {
   description?: string;
   inStock?: boolean;
   store: 'main' | 'lingerie';
+  createdAt?: string;
+  created_at?: string;
 }
 
-export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewProduct }: HomePageProps) {
-  const [isVisible, setIsVisible] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [trendingProducts, setTrendingProducts] = useState<CatalogProduct[]>([
-    { id: 'products:main:5', name: 'The Rabbit (New Model)', price: 2999, store: 'main', category: 'Vibrators', image: 'https://images.unsplash.com/photo-1625154253125-5d89afab6c7c?w=900', inStock: true },
-    { id: 'products:main:2', name: 'Mini Vibrating Panties', price: 2900, store: 'main', category: 'Vibrators', image: 'https://images.unsplash.com/photo-1625154253125-5d89afab6c7c?w=900', inStock: true },
-    { id: 'products:main:6', name: 'Luxury Massager', price: 3499, store: 'main', category: 'Massagers', image: 'https://images.unsplash.com/photo-1625154253125-5d89afab6c7c?w=900', inStock: true },
-    { id: 'products:lingerie:1', name: 'Candi Eros Lingerie', price: 999, store: 'lingerie', category: 'Sexy Lingerie', image: 'https://images.unsplash.com/photo-1591079496752-a56c5474af3f?w=900', inStock: true },
-    { id: 'products:lingerie:3', name: 'Sexy Floral Lace Bodysuit', price: 1600, store: 'lingerie', category: 'Sexy Lingerie', image: 'https://images.unsplash.com/photo-1591079496752-a56c5474af3f?w=900', inStock: true },
-    { id: 'products:lingerie:4', name: 'Satin Robe Set', price: 1299, store: 'lingerie', category: 'Sleepwear', image: 'https://images.unsplash.com/photo-1591079496752-a56c5474af3f?w=900', inStock: true }
-  ]);
-  const [bestSellers, setBestSellers] = useState<CatalogProduct[]>([]);
-  const [newArrivals, setNewArrivals] = useState<CatalogProduct[]>([]);
-  const carouselRef = useRef<HTMLDivElement>(null);
-  const dragX = useMotionValue(0);
-  const controls = useAnimation();
+interface HomePageProps {
+  onNavigate: (section: string) => void;
+  isAdmin: boolean;
+  onShowAuth: () => void;
+  onAddToCart?: (product: any) => void;
+  onViewProduct?: (productId: string) => void;
+}
 
-  const categoryCards = [
-    {
-      title: 'Sex Toys',
-      subtitle: 'Powerful essentials for deeper comfort and pleasure.',
-      image: 'https://images.unsplash.com/photo-1664347770836-03d04faa3c04?w=1200',
-      action: 'Shop Toys',
-      onClick: () => onNavigate('main-store')
-    },
-    {
-      title: 'Lingerie',
-      subtitle: 'Elegant silhouettes designed to feel beautiful.',
-      image: 'https://images.unsplash.com/photo-1591079496752-a56c5474af3f?w=1200',
-      action: 'Shop Lingerie',
-      onClick: () => onNavigate('lingerie-store')
-    },
-    {
-      title: "Couples' Products",
-      subtitle: 'Shared rituals and magnetic date-night finds.',
-      image: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=1200',
-      action: 'Explore Couples',
-      onClick: () => onNavigate('main-store')
-    },
-    {
-      title: 'Accessories',
-      subtitle: 'Thoughtful add-ons for a polished, elevated experience.',
-      image: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1200',
-      action: 'Browse Accessories',
-      onClick: () => onNavigate('main-store')
-    }
-  ];
+const categoryFallbacks = {
+  toys: 'https://images.unsplash.com/photo-1664347770836-03d04faa3c04?w=1100',
+  lingerie: 'https://images.unsplash.com/photo-1591079496752-a56c5474af3f?w=1100',
+  couples: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=1100',
+  accessories: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1100'
+};
 
-  const customerPerks = [
-    'Discreet nationwide delivery',
-    'M-Pesa friendly checkout',
-    '100% confidential shopping'
-  ];
+function formatPrice(price: number) {
+  return `KSh ${Number(price).toLocaleString()}`;
+}
+
+function getProductImage(product: CatalogProduct | undefined, fallback: string) {
+  return product?.image || fallback;
+}
+
+function ProductTile({
+  product,
+  onAddToCart,
+  onViewProduct,
+  label
+}: {
+  product: CatalogProduct;
+  onAddToCart?: (product: CatalogProduct) => void;
+  onViewProduct?: (productId: string) => void;
+  label?: string;
+}) {
+  return (
+    <article className="group min-w-0">
+      <button
+        type="button"
+        className="relative block w-full overflow-hidden bg-[#f5f0ee] text-left"
+        onClick={() => onViewProduct?.(product.id)}
+        aria-label={`View ${product.name}`}
+      >
+        <ImageWithFallback
+          src={product.image || categoryFallbacks.toys}
+          alt={product.name}
+          className="homepage-product-image w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+        />
+        {label && (
+          <span className="absolute left-3 top-3 bg-white/90 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#292323] backdrop-blur">
+            {label}
+          </span>
+        )}
+        {product.inStock === false && (
+          <span className="absolute right-3 top-3 bg-black/75 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-white">
+            Sold out
+          </span>
+        )}
+        <span className="absolute bottom-3 right-3 flex h-10 w-10 translate-y-2 items-center justify-center rounded-full bg-white text-black opacity-0 shadow-lg transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          <ArrowUpRight className="h-4 w-4" />
+        </span>
+      </button>
+      <div className="flex items-start justify-between gap-3 pt-4">
+        <button
+          type="button"
+          className="min-w-0 text-left"
+          onClick={() => onViewProduct?.(product.id)}
+        >
+          <p className="mb-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#a46a7d]">
+            {product.category}
+          </p>
+          <h3 className="line-clamp-1 text-sm font-medium text-[#241e1e] sm:text-base">
+            {product.name}
+          </h3>
+          <p className="mt-1.5 text-sm font-semibold text-[#241e1e]">{formatPrice(product.price)}</p>
+        </button>
+        <button
+          type="button"
+          aria-label={`Add ${product.name} to cart`}
+          disabled={product.inStock === false}
+          onClick={() => onAddToCart?.(product)}
+          className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-[#e8dadd] text-[#2a2022] transition hover:border-[#d8476d] hover:bg-[#d8476d] hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <ShoppingBag className="h-4 w-4" />
+        </button>
+      </div>
+    </article>
+  );
+}
+
+export function HomePage({ onNavigate, onAddToCart, onViewProduct }: HomePageProps) {
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
+  const trendingRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setIsVisible(true);
-  }, []);
+    let active = true;
 
-  useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchCatalog = async () => {
       try {
         const [mainResponse, lingerieResponse] = await Promise.all([
           fetch(`https://${projectId}.supabase.co/functions/v1/make-server-afd25991/products?store=main`, {
@@ -188,390 +137,374 @@ export function HomePage({ onNavigate, isAdmin, onShowAuth, onAddToCart, onViewP
           })
         ]);
 
-        const mainProducts = mainResponse.ok ? (await mainResponse.json()).products || [] : [];
-        const lingerieProducts = lingerieResponse.ok ? (await lingerieResponse.json()).products || [] : [];
-        const allProducts: CatalogProduct[] = [...mainProducts, ...lingerieProducts];
+        const [mainData, lingerieData] = await Promise.all([
+          mainResponse.ok ? mainResponse.json() : Promise.resolve({ products: [] }),
+          lingerieResponse.ok ? lingerieResponse.json() : Promise.resolve({ products: [] })
+        ]);
+        if (!mainResponse.ok) console.error(`Main catalog request failed (${mainResponse.status})`);
+        if (!lingerieResponse.ok) console.error(`Lingerie catalog request failed (${lingerieResponse.status})`);
+        const catalog: CatalogProduct[] = [
+          ...(mainData.products || []).map((product: CatalogProduct) => ({ ...product, store: 'main' as const })),
+          ...(lingerieData.products || []).map((product: CatalogProduct) => ({ ...product, store: 'lingerie' as const }))
+        ];
 
-        if (allProducts.length > 0) {
-          const featured = allProducts.slice(0, 8);
-          setTrendingProducts(featured);
-          setBestSellers([...allProducts].sort((a, b) => Number(b.price) - Number(a.price)).slice(0, 4));
-          setNewArrivals(allProducts.slice(-4));
-        }
+        if (active) setProducts(catalog);
       } catch (error) {
-        console.error('Error loading homepage products:', error);
+        console.error('Error loading homepage catalog:', error);
       }
     };
 
-    fetchProducts();
+    fetchCatalog();
+    return () => {
+      active = false;
+    };
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % Math.max(trendingProducts.length, 1));
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, [trendingProducts.length]);
-
-  useEffect(() => {
-    if (trendingProducts.length > 0) {
-      controls.start({
-        x: -currentSlide * (320 + 24),
-        transition: {
-          type: 'spring',
-          stiffness: 260,
-          damping: 28
-        }
-      });
+  const mainProducts = products.filter((product) => product.store === 'main');
+  const lingerieProducts = products.filter((product) => product.store === 'lingerie');
+  const trendingProducts = products.slice(0, 10);
+  const bestSellers = [...products]
+    .sort((a, b) => Number(b.price) - Number(a.price))
+    .slice(0, 4);
+  const datedProducts = products.filter((product) => product.createdAt || product.created_at);
+  const newArrivals = datedProducts.length > 0
+    ? [...datedProducts]
+      .sort((a, b) => {
+        const dateA = new Date(a.createdAt || a.created_at || 0).getTime();
+        const dateB = new Date(b.createdAt || b.created_at || 0).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, 4)
+    : products.slice(-4);
+  const heroProduct = mainProducts[0] || products[0];
+  const categories = [
+    {
+      name: 'Sex toys',
+      detail: 'Find your new favourite',
+      image: getProductImage(mainProducts[0], categoryFallbacks.toys),
+      destination: 'main-store',
+      index: '01'
+    },
+    {
+      name: 'Lingerie',
+      detail: 'Made to feel like you',
+      image: getProductImage(lingerieProducts[0], categoryFallbacks.lingerie),
+      destination: 'lingerie-store',
+      index: '02'
+    },
+    {
+      name: 'For two',
+      detail: 'A little closer, together',
+      image: getProductImage(mainProducts.find((product) => /couple|remote|wearable/i.test(`${product.category} ${product.name}`)) || mainProducts[1], categoryFallbacks.couples),
+      destination: 'main-store',
+      index: '03'
+    },
+    {
+      name: 'Accessories',
+      detail: 'The finishing touches',
+      image: getProductImage(mainProducts.find((product) => /accessor|lubricant|care|clean/i.test(`${product.category} ${product.name}`)) || mainProducts[2], categoryFallbacks.accessories),
+      destination: 'main-store',
+      index: '04'
     }
-  }, [currentSlide, controls, trendingProducts.length]);
+  ];
 
-  const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const offset = info.offset.x;
-    const velocity = info.velocity.x;
-
-    if (Math.abs(velocity) > 500 || Math.abs(offset) > 100) {
-      if (offset > 0) {
-        setCurrentSlide((prev) => (prev - 1 + trendingProducts.length) % trendingProducts.length);
-      } else {
-        setCurrentSlide((prev) => (prev + 1) % trendingProducts.length);
-      }
-    }
+  const scrollTrending = (direction: -1 | 1) => {
+    trendingRef.current?.scrollBy({ left: direction * 340, behavior: 'smooth' });
   };
 
-  const goToSlide = (index: number) => setCurrentSlide(index);
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % trendingProducts.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + trendingProducts.length) % trendingProducts.length);
+  const SectionHeading = ({ eyebrow, title, copy }: { eyebrow: string; title: string; copy?: string }) => (
+    <div className="mb-8 flex flex-col gap-3 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.24em] text-[#ad6d81]">{eyebrow}</p>
+        <h2 className="font-serif text-3xl leading-tight tracking-[-0.035em] text-[#211b1b] sm:text-4xl">{title}</h2>
+      </div>
+      {copy && <p className="max-w-sm text-sm leading-6 text-[#75696a]">{copy}</p>}
+    </div>
+  );
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[#f8f5f3] text-slate-900">
-      <section className="relative overflow-hidden bg-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(236,72,153,0.12),_transparent_38%),radial-gradient(circle_at_bottom_right,_rgba(15,23,42,0.08),_transparent_30%)]" />
-        <div className="relative z-10 mx-auto flex min-h-[760px] max-w-7xl items-center px-4 py-8 sm:px-6 lg:px-8">
-          <div className="grid w-full items-center gap-12 lg:grid-cols-[1.05fr_1.2fr]">
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 24 }}
-              transition={{ duration: 0.8 }}
-              className="mx-auto w-full max-w-xl lg:mx-0"
-            >
-              <Badge className="mb-5 border-pink-200 bg-pink-50 text-pink-700 shadow-sm">
-                <Sparkles className="mr-2 h-3.5 w-3.5" />
-                Premium pleasure, beautifully curated
-              </Badge>
-
-              <h1 className="mb-5 text-4xl font-semibold tracking-[-0.05em] text-slate-950 sm:text-5xl lg:text-[4.2rem] leading-[0.95]">
-                Intimate essentials for every moment.
-              </h1>
-
-              <p className="mb-8 max-w-lg text-lg leading-relaxed text-slate-600">
-                Discover premium sex toys, elegant lingerie, and thoughtful couple's favourites designed for confidence, comfort, and connection.
-              </p>
-
-              <div className="mb-8 flex flex-col gap-4 sm:flex-row">
-                <Button
-                  size="lg"
-                  className="gap-2 bg-slate-950 px-6 py-6 text-base text-white shadow-lg shadow-slate-900/10 hover:bg-slate-800"
-                  onClick={() => onNavigate('main-store')}
-                >
-                  <Heart className="h-4 w-4 fill-pink-500 text-pink-500" />
-                  Shop sex toys
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-slate-200 bg-white px-6 py-6 text-base text-slate-900 shadow-sm hover:border-pink-300 hover:text-pink-700"
-                  onClick={() => onNavigate('lingerie-store')}
-                >
-                  <Sparkles className="h-4 w-4 text-pink-500" />
-                  Browse lingerie
-                </Button>
-              </div>
-
-              <div className="mb-8 flex flex-wrap gap-3">
-                {customerPerks.map((perk) => (
-                  <div key={perk} className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm">
-                    {perk}
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex items-center gap-4 rounded-[28px] border border-slate-200 bg-white p-4 shadow-[0_20px_50px_rgba(15,23,42,0.06)]">
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <div>
-                  <p className="text-2xl font-semibold text-slate-950"><AnimatedCounter target={10000} /></p>
-                  <p className="text-sm text-slate-500">happy customers</p>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 32 }}
-              animate={{ opacity: isVisible ? 1 : 0, x: isVisible ? 0 : 32 }}
-              transition={{ duration: 0.9, delay: 0.2 }}
-              className="relative"
-            >
-              <div className="relative overflow-hidden rounded-[32px] border border-slate-200 bg-white p-3 shadow-[0_40px_80px_rgba(15,23,42,0.12)]">
-                <div className="grid gap-3 sm:grid-cols-[1.2fr_0.8fr]">
-                  <div className="relative overflow-hidden rounded-[24px]">
-                    <ImageWithFallback
-                      src="https://images.unsplash.com/photo-1664347770836-03d04faa3c04?w=1200"
-                      alt="Sensual Kenya intimate product collection"
-                      className="h-[430px] w-full rounded-[24px] object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 to-transparent" />
-                    <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.2em] text-pink-200">Featured</p>
-                        <h3 className="mt-2 text-2xl font-semibold text-white">Premium toys</h3>
-                      </div>
-                      <Button
-                        size="sm"
-                        className="bg-white text-slate-900 hover:bg-pink-50"
-                        onClick={() => onNavigate('main-store')}
-                      >
-                        Shop now
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-3">
-                    <div className="overflow-hidden rounded-[24px]">
-                      <ImageWithFallback
-                        src="https://images.unsplash.com/photo-1591079496752-a56c5474af3f?w=1200"
-                        alt="Sensual Kenya lingerie selection"
-                        className="h-[210px] w-full rounded-[24px] object-cover"
-                      />
-                    </div>
-                    <div className="rounded-[24px] bg-slate-950 p-4 text-white">
-                      <p className="mb-2 text-xs uppercase tracking-[0.2em] text-pink-200">New</p>
-                      <h3 className="mb-1 text-2xl font-semibold">Luxe lingerie</h3>
-                      <p className="mb-4 text-sm text-slate-300">Soft fabrics. Beautiful silhouettes.</p>
-                      <Button
-                        variant="secondary"
-                        className="bg-white text-slate-900 hover:bg-pink-50"
-                        onClick={() => onNavigate('lingerie-store')}
-                      >
-                        View collection
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="absolute -bottom-8 -left-8 rounded-full border border-pink-200 bg-pink-50 px-5 py-3 text-sm font-medium text-pink-700 shadow-lg shadow-pink-100">
-                ✨ Discreet delivery across Kenya
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
-            <div className="mb-10 flex flex-col items-center justify-center text-center">
-              <Badge className="mb-4 border-pink-200 bg-pink-50 text-pink-700 shadow-sm">
-                <TrendingUp className="mr-2 h-3.5 w-3.5" />
-                Trending now
-              </Badge>
-              <h2 className="mb-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950 sm:text-4xl">Best-loved picks this week</h2>
-              <p className="max-w-2xl text-lg text-slate-600">Curated favourites from our most-loved adult toys and lingerie collections.</p>
-            </div>
-          </motion.div>
-
-          <div className="relative">
-            <motion.button
-              className="absolute left-0 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-slate-200 bg-white p-3 shadow-lg shadow-slate-200/60 md:block"
-              onClick={prevSlide}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <ChevronLeft className="h-5 w-5 text-slate-900" />
-            </motion.button>
-
-            <motion.button
-              className="absolute right-0 top-1/2 z-20 hidden -translate-y-1/2 rounded-full border border-slate-200 bg-white p-3 shadow-lg shadow-slate-200/60 md:block"
-              onClick={nextSlide}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <ChevronRight className="h-5 w-5 text-slate-900" />
-            </motion.button>
-
-            <div className="overflow-hidden px-2 pb-8 md:px-10">
-              <motion.div
-                ref={carouselRef}
-                className="flex gap-5"
-                drag="x"
-                dragConstraints={{ left: -1600, right: 0 }}
-                onDragEnd={handleDragEnd}
-                animate={controls}
-                style={{ x: dragX }}
+    <main className="homepage-redesign overflow-hidden" style={{ backgroundColor: '#ffffff', color: '#241e1e' }}>
+      <section className="homepage-hero relative">
+        <div className="mx-auto max-w-[1480px]">
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="homepage-hero-copy flex flex-col justify-center"
+          >
+            <p className="homepage-eyebrow mb-7 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.22em]">
+              Sensual Kenya
+              <span className="heart-glow text-base leading-none" aria-label="love">❤️</span>
+              <span className="ml-1 h-px w-8 bg-[#d7b6be]" />
+              Intimate wellness, considered
+            </p>
+            <h1 className="homepage-hero-title max-w-xl font-serif">
+              Feel good
+              <br />
+              <span className="homepage-accent italic">in your</span>
+              <br />
+              own skin.
+            </h1>
+            <p className="homepage-subcopy mt-7 max-w-md">
+              A thoughtful edit of intimate essentials, beautiful lingerie, and little things that bring you closer.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button
+                size="lg"
+                onClick={() => onNavigate('main-store')}
+                className="homepage-primary-cta h-12 rounded-none px-6 text-sm font-medium"
               >
-                {trendingProducts.map((product, index) => (
-                  <motion.div
-                    key={product.id}
-                    className="min-w-[270px] sm:min-w-[290px] md:min-w-[320px]"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.05 }}
-                  >
-                    <Card className="group overflow-hidden border border-slate-200 bg-white shadow-[0_20px_45px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_25px_50px_rgba(236,72,153,0.14)]">
-                      <CardContent className="p-0">
-                        <div className="relative overflow-hidden">
-                          <ImageWithFallback
-                            src={product.image || 'https://images.unsplash.com/photo-1625154253125-5d89afab6c7c?w=900'}
-                            alt={product.name}
-                            className="aspect-[4/5] w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          />
-                          <Badge className="absolute right-3 top-3 border-0 bg-white/90 text-slate-900 shadow-sm backdrop-blur-sm">
-                            {product.category}
-                          </Badge>
-                        </div>
-                        <div className="p-4">
-                          <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.18em] text-pink-600">Sensual Kenya</p>
-                          <h3 className="mb-3 line-clamp-2 min-h-[3rem] text-xl font-medium text-slate-900">{product.name}</h3>
-                          <div className="flex items-center justify-between gap-3">
-                            <p className="text-xl font-semibold text-slate-950">KSh {Number(product.price).toLocaleString()}</p>
-                            <Button
-                              size="sm"
-                              className="bg-slate-950 text-white hover:bg-slate-800"
-                              onClick={() => onAddToCart?.(product)}
-                            >
-                              Add
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </motion.div>
+                Explore the edit <ArrowRight className="ml-3 h-4 w-4" />
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => onNavigate('lingerie-store')}
+                className="homepage-secondary-cta h-12 rounded-none px-6 text-sm font-medium"
+              >
+                Discover lingerie
+              </Button>
             </div>
-          </div>
+            <a href="#collections" className="mt-12 hidden w-fit items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8b7779] lg:flex">
+              Scroll to explore <ArrowDown className="h-3.5 w-3.5" />
+            </a>
+          </motion.div>
 
-          <div className="mt-6 flex justify-center gap-2">
-            {trendingProducts.map((_, index) => (
+          <motion.div
+            initial={{ opacity: 0, scale: 1.025 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.9 }}
+            className="homepage-hero-art relative overflow-hidden bg-[#e7d9d6]"
+          >
+            <ImageWithFallback
+              src={getProductImage(heroProduct, categoryFallbacks.lingerie)}
+              alt={heroProduct?.name || 'Sensual Kenya intimate wellness collection'}
+              className="absolute inset-0 h-full w-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/5" />
+            <div className="absolute left-5 top-5 flex items-center gap-2 border border-white/40 bg-white/80 px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#302526] backdrop-blur sm:left-8 sm:top-8">
+              <Sparkles className="h-3.5 w-3.5 text-[#c56681]" />
+              Curated for you
+            </div>
+            {heroProduct && (
               <button
-                key={index}
-                aria-label={`Go to slide ${index + 1}`}
-                className={`h-2.5 rounded-full transition-all ${index === currentSlide ? 'w-8 bg-slate-950' : 'w-2.5 bg-slate-300 hover:bg-slate-400'}`}
-                onClick={() => goToSlide(index)}
+                type="button"
+                onClick={() => onViewProduct?.(heroProduct.id)}
+                className="absolute bottom-5 left-5 flex max-w-[calc(100%-2.5rem)] items-center gap-4 bg-white/95 p-3 text-left shadow-xl backdrop-blur transition hover:bg-white sm:bottom-8 sm:left-8 sm:p-4"
+              >
+                <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center bg-[#f6e8eb] text-[#bd637c]">
+                  <Heart className="h-5 w-5" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[9px] font-semibold uppercase tracking-[0.2em] text-[#a46a7d]">Featured find</span>
+                  <span className="mt-1 block truncate text-sm font-semibold text-[#241e1e]">{heroProduct.name}</span>
+                  <span className="mt-0.5 block text-xs text-[#706566]">{formatPrice(heroProduct.price)}</span>
+                </span>
+                <ArrowUpRight className="ml-1 h-4 w-4 flex-shrink-0 text-[#6e5d60]" />
+              </button>
+            )}
+            <div className="absolute bottom-8 right-7 hidden max-w-[140px] text-right text-[10px] font-medium uppercase leading-5 tracking-[0.2em] text-white/90 lg:block">
+              Intimacy, on your terms
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="border-b border-[#eee6e4] bg-white">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 divide-y divide-[#eee6e4] px-6 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:px-8">
+          {[
+            { icon: LockKeyhole, title: 'Your privacy, protected', copy: 'Discreet packaging on every order' },
+            { icon: ShieldCheck, title: 'Shop with confidence', copy: 'Thoughtfully selected essentials' },
+            { icon: Truck, title: 'Delivered across Kenya', copy: 'Reliable delivery, wherever you are' }
+          ].map(({ icon: Icon, title, copy }) => (
+            <div key={title} className="flex items-center gap-4 py-5 sm:justify-center sm:py-6">
+              <Icon className="h-4 w-4 flex-shrink-0 text-[#bd7185]" strokeWidth={1.6} />
+              <div>
+                <p className="text-xs font-semibold text-[#302627]">{title}</p>
+                <p className="mt-1 text-[11px] text-[#877b7c]">{copy}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="collections" className="mx-auto max-w-7xl px-6 py-16 sm:px-8 sm:py-24">
+        <SectionHeading
+          eyebrow="A world of possibility"
+          title="Find what feels like you."
+          copy="Explore a considered collection made for confidence, connection, and a little more pleasure in the everyday."
+        />
+        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+          {categories.map((category, index) => (
+            <motion.button
+              key={category.name}
+              type="button"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.45, delay: index * 0.07 }}
+              onClick={() => onNavigate(category.destination)}
+              className={`group relative block overflow-hidden bg-[#eee5e3] text-left ${index % 2 === 1 ? 'mt-7 sm:mt-10' : ''}`}
+            >
+              <ImageWithFallback
+                src={category.image}
+                alt={`${category.name} collection`}
+                className="homepage-category-image w-full object-cover transition-transform duration-700 group-hover:scale-[1.045]"
               />
-            ))}
-          </div>
+              <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/5 to-transparent" />
+              <span className="absolute left-4 top-4 text-[9px] font-semibold tracking-[0.18em] text-white/80 sm:left-6 sm:top-6">{category.index}</span>
+              <span className="absolute inset-x-4 bottom-4 text-white sm:inset-x-6 sm:bottom-6">
+                <span className="block font-serif text-xl leading-tight sm:text-2xl">{category.name}</span>
+                <span className="mt-1.5 flex items-center justify-between gap-2 text-[10px] font-medium uppercase tracking-[0.12em] text-white/75 sm:text-[11px]">
+                  {category.detail}
+                  <ArrowUpRight className="h-4 w-4 flex-shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                </span>
+              </span>
+            </motion.button>
+          ))}
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} className="mb-10 text-center">
-            <Badge className="mb-4 border-pink-200 bg-pink-50 text-pink-700 shadow-sm">Curated collections</Badge>
-            <h2 className="text-3xl font-semibold tracking-[-0.04em] text-slate-950 sm:text-4xl">Shop by category</h2>
-          </motion.div>
-
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            {categoryCards.map((category, index) => (
-              <motion.div key={category.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: index * 0.1 }}>
-                <Card className="group cursor-pointer overflow-hidden border border-slate-200 bg-white shadow-[0_20px_45px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_25px_50px_rgba(236,72,153,0.12)]" onClick={category.onClick}>
-                  <CardContent className="p-0">
-                    <div className="relative h-[360px] overflow-hidden">
-                      <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style={{ backgroundImage: `url(${category.image})` }} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-                      <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-                        <p className="mb-2 text-[11px] uppercase tracking-[0.2em] text-pink-200">Collection</p>
-                        <h3 className="mb-2 text-2xl font-semibold">{category.title}</h3>
-                        <p className="mb-4 text-sm text-slate-200">{category.subtitle}</p>
-                        <Button variant="secondary" className="bg-white text-slate-900 hover:bg-pink-50" onClick={(event) => { event.stopPropagation(); category.onClick(); }}>
-                          {category.action}
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-white py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-10 lg:grid-cols-2">
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
-              <div className="mb-8 flex items-center gap-3">
-                <Badge className="border-pink-200 bg-pink-50 text-pink-700 shadow-sm">Best sellers</Badge>
+      <section className="homepage-trending py-16 sm:py-24">
+        <div className="mx-auto max-w-7xl px-6 sm:px-8">
+          <div className="flex items-end justify-between gap-4">
+            <SectionHeading
+              eyebrow="The community loves"
+              title="Trending now."
+              copy="The pieces people are coming back for."
+            />
+            {trendingProducts.length > 3 && (
+              <div className="mb-9 hidden gap-2 sm:flex">
+                <button type="button" aria-label="Previous products" onClick={() => scrollTrending(-1)} className="flex h-10 w-10 items-center justify-center border border-[#dfd2d0] transition hover:border-[#241e1e] hover:bg-white">
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button type="button" aria-label="Next products" onClick={() => scrollTrending(1)} className="flex h-10 w-10 items-center justify-center border border-[#dfd2d0] transition hover:border-[#241e1e] hover:bg-white">
+                  <ChevronRight className="h-4 w-4" />
+                </button>
               </div>
-              <div className="grid gap-5 sm:grid-cols-2">
+            )}
+          </div>
+          {trendingProducts.length > 0 ? (
+            <div ref={trendingRef} className="-mx-6 flex snap-x snap-mandatory gap-5 overflow-x-auto px-6 pb-3 scrollbar-hide sm:mx-0 sm:px-0">
+              {trendingProducts.map((product, index) => (
+                <div key={product.id} className="homepage-trending-item snap-start">
+                  <ProductTile product={product} onAddToCart={onAddToCart} onViewProduct={onViewProduct} label={index === 0 ? 'Most loved' : undefined} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
+              {categories.slice(0, 4).map((category) => (
+                <button key={category.name} type="button" onClick={() => onNavigate(category.destination)} className="text-left">
+                  <ImageWithFallback src={category.image} alt={category.name} className="aspect-[4/5] w-full object-cover" />
+                  <span className="mt-3 block text-sm font-medium">{category.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="mt-8 flex justify-center sm:justify-start">
+            <Button variant="link" onClick={() => onNavigate('main-store')} className="h-auto p-0 text-xs font-semibold uppercase tracking-[0.17em] text-[#392b2d] hover:text-[#bd637c]">
+              Shop all products <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 py-16 sm:px-8 sm:py-24">
+        <div className="grid gap-16 lg:grid-cols-2 lg:gap-12">
+          <div>
+            <SectionHeading eyebrow="Worth discovering" title="Best sellers." />
+            {bestSellers.length > 0 ? (
+              <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6">
                 {bestSellers.map((product) => (
-                  <ProductCard key={product.id} product={product} onAddToCart={(item) => onAddToCart?.(item)} onViewProduct={onViewProduct} />
+                  <ProductTile key={`best-${product.id}`} product={product} onAddToCart={onAddToCart} onViewProduct={onViewProduct} />
                 ))}
               </div>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7, delay: 0.1 }}>
-              <div className="mb-8 flex items-center gap-3">
-                <Badge className="border-pink-200 bg-pink-50 text-pink-700 shadow-sm">New arrivals</Badge>
-              </div>
-              <div className="grid gap-5 sm:grid-cols-2">
+            ) : (
+              <button type="button" onClick={() => onNavigate('main-store')} className="group relative block w-full overflow-hidden bg-[#f5f0ee] text-left">
+                <ImageWithFallback src={categoryFallbacks.toys} alt="Explore best-loved intimate essentials" className="aspect-[1.45] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+                <span className="absolute inset-0 bg-gradient-to-t from-black/65 to-transparent" />
+                <span className="absolute bottom-5 left-5 text-lg font-medium text-white">Find your new favourite <ArrowRight className="ml-2 inline h-4 w-4" /></span>
+              </button>
+            )}
+          </div>
+          <div>
+            <SectionHeading eyebrow="Just arrived" title="New arrivals." />
+            {newArrivals.length > 0 ? (
+              <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6">
                 {newArrivals.map((product) => (
-                  <ProductCard key={product.id} product={product} onAddToCart={(item) => onAddToCart?.(item)} onViewProduct={onViewProduct} />
+                  <ProductTile key={`new-${product.id}`} product={product} onAddToCart={onAddToCart} onViewProduct={onViewProduct} label="New" />
                 ))}
               </div>
-            </motion.div>
+            ) : (
+              <button type="button" onClick={() => onNavigate('lingerie-store')} className="group relative block w-full overflow-hidden bg-[#f5f0ee] text-left">
+                <ImageWithFallback src={categoryFallbacks.lingerie} alt="Discover new lingerie arrivals" className="aspect-[1.45] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+                <span className="absolute inset-0 bg-gradient-to-t from-black/65 to-transparent" />
+                <span className="absolute bottom-5 left-5 text-lg font-medium text-white">Meet the latest edit <ArrowRight className="ml-2 inline h-4 w-4" /></span>
+              </button>
+            )}
           </div>
         </div>
       </section>
 
-      <section className="bg-gradient-to-r from-slate-950 via-slate-900 to-pink-950 py-20 text-white">
-        <div className="mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
-            <div className="mb-5 inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 p-3 text-pink-200">
-              <MessageCircle className="h-5 w-5" />
-            </div>
-            <h2 className="mb-4 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">Need a little guidance?</h2>
-            <p className="mx-auto max-w-2xl text-lg text-slate-200">Please feel free to contact us for any product enquiries or further information.</p>
-            <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-              <Button className="bg-white text-slate-950 hover:bg-pink-50" onClick={() => onNavigate('contact')}>
-                Contact us
-              </Button>
-              <Button variant="outline" className="border-white/20 bg-white/5 text-white hover:bg-white/10" onClick={() => onNavigate('blog')}>
-                Read our blog
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-6 md:grid-cols-3">
-            {[
-              { icon: Package, title: 'Discreet packaging', description: 'Private, secure delivery to keep your order confidential.' },
-              { icon: Shield, title: 'Secure checkout', description: 'Trusted payment options with a smooth, safe shopping experience.' },
-              { icon: Truck, title: 'Fast delivery', description: 'National delivery with quick turnaround times across Kenya.' }
-            ].map((feature, index) => (
-              <motion.div key={feature.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: index * 0.08 }}>
-                <Card className="h-full border border-slate-200 bg-white shadow-[0_20px_45px_rgba(15,23,42,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_25px_50px_rgba(236,72,153,0.10)]">
-                  <CardContent className="flex h-full flex-col items-center p-8 text-center">
-                    <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-pink-50 text-pink-600">
-                      <feature.icon className="h-7 w-7" />
-                    </div>
-                    <h3 className="mb-3 text-xl font-semibold text-slate-950">{feature.title}</h3>
-                    <p className="text-slate-600">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+      <section className="homepage-contact relative overflow-hidden">
+        <div className="absolute -right-20 -top-32 h-80 w-80 rounded-full border border-white/70 sm:h-[30rem] sm:w-[30rem]" />
+        <div className="absolute -right-10 -top-20 h-60 w-60 rounded-full border border-white/50 sm:h-[24rem] sm:w-[24rem]" />
+        <div className="relative mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 px-6 py-14 sm:px-8 sm:py-20 lg:flex-row lg:items-center">
+          <div className="max-w-2xl">
+            <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.24em] text-[#a46779]">Here for you</p>
+            <h2 className="font-serif text-3xl leading-tight tracking-[-0.035em] text-[#241e1e] sm:text-5xl">
+              A question? We’re always happy to help.
+            </h2>
+            <p className="mt-4 max-w-xl text-sm leading-7 text-[#746668] sm:text-base">
+              Please feel free to contact us for any product enquiries or further information.
+            </p>
           </div>
+          <Button
+            size="lg"
+            onClick={() => onNavigate('contact')}
+            className="homepage-primary-cta h-12 rounded-none px-6 text-sm"
+          >
+            Get in touch <ArrowRight className="ml-3 h-4 w-4" />
+          </Button>
         </div>
       </section>
-    </div>
+      <style>{`
+        .homepage-redesign { color: #241e1e; background: #fff; }
+        .homepage-hero { background: #f8f3f1; }
+        .homepage-hero > div { display: grid; grid-template-columns: minmax(0, 1fr); }
+        .homepage-hero-copy { order: 2; padding: 2.25rem 1.5rem 3rem; }
+        .homepage-hero-art { order: 1; height: min(94vw, 560px); min-height: 360px; }
+        .homepage-hero-title { color: #211b1b; font-size: clamp(2.65rem, 10vw, 6.6rem); line-height: .92; letter-spacing: -.065em; }
+        .homepage-accent { color: #bf6f86; }
+        .homepage-eyebrow { color: #805461; }
+        .homepage-subcopy { color: #6e6263; font-size: 1rem; line-height: 1.8; }
+        .homepage-primary-cta { background: #241e1e !important; color: #fff !important; }
+        .homepage-primary-cta:hover { background: #d8476d !important; }
+        .homepage-secondary-cta { border: 1px solid #d8c8c8 !important; background: transparent !important; color: #241e1e !important; }
+        .homepage-secondary-cta:hover { border-color: #d8476d !important; background: #fff !important; }
+        .homepage-product-image { display: block; aspect-ratio: 4 / 5; }
+        .homepage-category-image { display: block; aspect-ratio: .78; }
+        .homepage-trending-item { width: 72vw; max-width: 285px; flex-shrink: 0; }
+        .homepage-trending { background: #f8f4f2; }
+        .homepage-contact { background: #f1e5e5; padding: 3.5rem 0; }
+        .homepage-redesign h2 { color: #211b1b; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(2rem, 4vw, 2.75rem); line-height: 1.12; letter-spacing: -.035em; }
+        @media (min-width: 640px) {
+          .homepage-hero-copy { padding: 2.5rem 2.5rem 3rem; }
+          .homepage-trending-item { width: calc((100% - 2.5rem) / 3); max-width: none; }
+        }
+        @media (min-width: 1024px) {
+          .homepage-hero > div { grid-template-columns: minmax(0, .83fr) minmax(0, 1.17fr); min-height: 690px; }
+          .homepage-hero-copy { order: 1; padding: 4rem 3.5rem 4rem 4rem; }
+          .homepage-hero-art { order: 2; height: auto; min-height: 690px; }
+          .homepage-subcopy { font-size: 1.125rem; }
+          .homepage-contact { padding: 5rem 0; }
+          .homepage-trending-item { width: calc((100% - 3.75rem) / 4); }
+        }
+        .scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .heart-glow { filter: drop-shadow(0 0 5px rgba(235, 31, 64, .75)); }
+      `}</style>
+    </main>
   );
 }
