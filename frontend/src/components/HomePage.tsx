@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  ArrowDown,
   ArrowRight,
   ArrowUpRight,
   ChevronLeft,
@@ -9,7 +8,6 @@ import {
   LockKeyhole,
   ShieldCheck,
   ShoppingBag,
-  Sparkles,
   Truck
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -179,7 +177,7 @@ export function HomePage({ onNavigate, onAddToCart, onViewProduct }: HomePagePro
   const heroProduct = mainProducts[0] || products[0];
   const categories = [
     {
-      name: 'Sex toys',
+      name: 'Sex Toys',
       detail: 'Find your new favourite',
       image: getProductImage(mainProducts[0], categoryFallbacks.toys),
       destination: 'main-store',
@@ -193,7 +191,7 @@ export function HomePage({ onNavigate, onAddToCart, onViewProduct }: HomePagePro
       index: '02'
     },
     {
-      name: 'For two',
+      name: "Couples' Products",
       detail: 'A little closer, together',
       image: getProductImage(mainProducts.find((product) => /couple|remote|wearable/i.test(`${product.category} ${product.name}`)) || mainProducts[1], categoryFallbacks.couples),
       destination: 'main-store',
@@ -212,318 +210,374 @@ export function HomePage({ onNavigate, onAddToCart, onViewProduct }: HomePagePro
     trendingRef.current?.scrollBy({ left: direction * 340, behavior: 'smooth' });
   };
 
-  const SectionHeading = ({ eyebrow, title, copy }: { eyebrow: string; title: string; copy?: string }) => (
-    <div className="mb-8 flex flex-col gap-3 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.24em] text-[#ad6d81]">{eyebrow}</p>
-        <h2 className="font-serif text-3xl leading-tight tracking-[-0.035em] text-[#211b1b] sm:text-4xl">{title}</h2>
-      </div>
-      {copy && <p className="max-w-sm text-sm leading-6 text-[#75696a]">{copy}</p>}
-    </div>
-  );
+  useEffect(() => {
+    const track = trendingRef.current;
+    if (!track || trendingProducts.length < 2) return;
+
+    const autoplay = window.setInterval(() => {
+      if (track.matches(':hover') || track.contains(document.activeElement)) return;
+      const end = track.scrollWidth - track.clientWidth;
+      if (track.scrollLeft >= end - 5) track.scrollTo({ left: 0, behavior: 'smooth' });
+      else scrollTrending(1);
+    }, 4500);
+
+    return () => window.clearInterval(autoplay);
+  }, [trendingProducts.length]);
 
   return (
-    <main className="homepage-redesign overflow-hidden" style={{ backgroundColor: '#ffffff', color: '#241e1e' }}>
-      <section className="homepage-hero relative">
-        <div className="mx-auto max-w-[1480px]">
+    <main className="sk-home">
+      <div className="sk-delivery-ribbon">
+        <span>✦ DISCREET DELIVERY ACROSS KENYA</span>
+        <span className="sk-ribbon-separator">|</span>
+        <span>SHOP WITH CONFIDENCE</span>
+      </div>
+
+      <section className="sk-hero">
+        <div className="sk-container sk-hero-grid">
           <motion.div
-            initial={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="homepage-hero-copy flex flex-col justify-center"
+            transition={{ duration: 0.6 }}
+            className="sk-hero-copy"
           >
-            <p className="homepage-eyebrow mb-7 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.22em]">
-              Sensual Kenya
-              <span className="heart-glow text-base leading-none" aria-label="love">❤️</span>
-              <span className="ml-1 h-px w-8 bg-[#d7b6be]" />
-              Intimate wellness, considered
+            <p className="sk-eyebrow">
+              SENSUAL WELLNESS, REDEFINED <span className="sk-glowing-heart" aria-label="love">❤️</span>
             </p>
-            <h1 className="homepage-hero-title max-w-xl font-serif">
-              Feel good
-              <br />
-              <span className="homepage-accent italic">in your</span>
-              <br />
-              own skin.
-            </h1>
-            <p className="homepage-subcopy mt-7 max-w-md">
-              A thoughtful edit of intimate essentials, beautiful lingerie, and little things that bring you closer.
+            <h1>Elevate Your <em>Intimate Moments</em></h1>
+            <p className="sk-hero-description">
+              Discover Kenya&apos;s trusted destination for sensual wellness, intimate products and elegant lingerie.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button
-                size="lg"
-                onClick={() => onNavigate('main-store')}
-                className="homepage-primary-cta h-12 rounded-none px-6 text-sm font-medium"
-              >
-                Explore the edit <ArrowRight className="ml-3 h-4 w-4" />
+            <div className="sk-actions">
+              <Button onClick={() => onNavigate('main-store')} className="sk-button sk-button-primary">
+                Shop Adult Toys <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => onNavigate('lingerie-store')}
-                className="homepage-secondary-cta h-12 rounded-none px-6 text-sm font-medium"
-              >
-                Discover lingerie
+              <Button onClick={() => onNavigate('lingerie-store')} className="sk-button sk-button-outline">
+                Browse Lingerie
               </Button>
             </div>
-            <a href="#collections" className="mt-12 hidden w-fit items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8b7779] lg:flex">
-              Scroll to explore <ArrowDown className="h-3.5 w-3.5" />
-            </a>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, scale: 1.025 }}
+            initial={{ opacity: 0, scale: 1.02 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.9 }}
-            className="homepage-hero-art relative overflow-hidden bg-[#e7d9d6]"
+            transition={{ duration: 0.75 }}
+            className="sk-hero-photo"
           >
             <ImageWithFallback
               src={getProductImage(heroProduct, categoryFallbacks.lingerie)}
               alt={heroProduct?.name || 'Sensual Kenya intimate wellness collection'}
-              className="absolute inset-0 h-full w-full object-cover object-center"
+              className="sk-cover-image"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/5" />
-            <div className="absolute left-5 top-5 flex items-center gap-2 border border-white/40 bg-white/80 px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#302526] backdrop-blur sm:left-8 sm:top-8">
-              <Sparkles className="h-3.5 w-3.5 text-[#c56681]" />
-              Curated for you
-            </div>
             {heroProduct && (
               <button
                 type="button"
+                className="sk-featured-product"
                 onClick={() => onViewProduct?.(heroProduct.id)}
-                className="absolute bottom-5 left-5 flex max-w-[calc(100%-2.5rem)] items-center gap-4 bg-white/95 p-3 text-left shadow-xl backdrop-blur transition hover:bg-white sm:bottom-8 sm:left-8 sm:p-4"
               >
-                <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center bg-[#f6e8eb] text-[#bd637c]">
-                  <Heart className="h-5 w-5" />
+                <span className="sk-featured-icon"><Heart className="h-5 w-5" /></span>
+                <span>
+                  <span className="sk-featured-label">Featured find</span>
+                  <span className="sk-featured-name">{heroProduct.name}</span>
+                  <span className="sk-featured-price">{formatPrice(heroProduct.price)}</span>
                 </span>
-                <span className="min-w-0">
-                  <span className="block text-[9px] font-semibold uppercase tracking-[0.2em] text-[#a46a7d]">Featured find</span>
-                  <span className="mt-1 block truncate text-sm font-semibold text-[#241e1e]">{heroProduct.name}</span>
-                  <span className="mt-0.5 block text-xs text-[#706566]">{formatPrice(heroProduct.price)}</span>
-                </span>
-                <ArrowUpRight className="ml-1 h-4 w-4 flex-shrink-0 text-[#6e5d60]" />
+                <ArrowUpRight className="h-4 w-4" />
               </button>
             )}
-            <div className="absolute bottom-8 right-7 hidden max-w-[140px] text-right text-[10px] font-medium uppercase leading-5 tracking-[0.2em] text-white/90 lg:block">
-              Intimacy, on your terms
-            </div>
           </motion.div>
         </div>
       </section>
 
-      <section className="homepage-trust border-b">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 divide-y divide-[#eee6e4] px-6 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:px-8">
-          {[
-            { icon: LockKeyhole, title: 'Your privacy, protected', copy: 'Discreet packaging on every order' },
-            { icon: ShieldCheck, title: 'Shop with confidence', copy: 'Thoughtfully selected essentials' },
-            { icon: Truck, title: 'Delivered across Kenya', copy: 'Reliable delivery, wherever you are' }
-          ].map(({ icon: Icon, title, copy }) => (
-            <div key={title} className="flex items-center gap-4 py-5 sm:justify-center sm:py-6">
-              <Icon className="h-4 w-4 flex-shrink-0 text-[#bd7185]" strokeWidth={1.6} />
-              <div>
-                <p className="text-xs font-semibold text-[#302627]">{title}</p>
-                <p className="mt-1 text-[11px] text-[#877b7c]">{copy}</p>
-              </div>
-            </div>
-          ))}
+      <section className="sk-rating-strip">
+        <div className="sk-container sk-rating-content">
+          <span className="sk-stars" aria-label="5 stars">★★★★★</span>
+          <strong>Loved by 10,000+ customers</strong>
+          <span>Your privacy and comfort come first</span>
         </div>
       </section>
 
-      <section id="collections" className="homepage-collections">
-        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-8 sm:py-24">
-        <SectionHeading
-          eyebrow="A world of possibility"
-          title="Find what feels like you."
-          copy="Explore a considered collection made for confidence, connection, and a little more pleasure in the everyday."
-        />
-        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-          {categories.map((category, index) => (
-            <motion.button
-              key={category.name}
-              type="button"
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.45, delay: index * 0.07 }}
-              onClick={() => onNavigate(category.destination)}
-              className={`group relative block overflow-hidden bg-[#eee5e3] text-left ${index % 2 === 1 ? 'mt-7 sm:mt-10' : ''}`}
-            >
-              <ImageWithFallback
-                src={category.image}
-                alt={`${category.name} collection`}
-                className="homepage-category-image w-full object-cover transition-transform duration-700 group-hover:scale-[1.045]"
-              />
-              <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/5 to-transparent" />
-              <span className="absolute left-4 top-4 text-[9px] font-semibold tracking-[0.18em] text-white/80 sm:left-6 sm:top-6">{category.index}</span>
-              <span className="absolute inset-x-4 bottom-4 text-white sm:inset-x-6 sm:bottom-6">
-                <span className="block font-serif text-xl leading-tight sm:text-2xl">{category.name}</span>
-                <span className="mt-1.5 flex items-center justify-between gap-2 text-[10px] font-medium uppercase tracking-[0.12em] text-white/75 sm:text-[11px]">
-                  {category.detail}
-                  <ArrowUpRight className="h-4 w-4 flex-shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+      <section id="collections" className="sk-section">
+        <div className="sk-container">
+          <div className="sk-section-heading">
+            <div>
+              <p className="sk-eyebrow">A little something for everyone</p>
+              <h2>Explore Our Collections</h2>
+            </div>
+            <button type="button" onClick={() => onNavigate('main-store')} className="sk-text-link">
+              View All <ArrowRight className="ml-1 inline h-4 w-4" />
+            </button>
+          </div>
+          <div className="sk-collections">
+            {categories.map((category, index) => (
+              <motion.button
+                key={category.name}
+                type="button"
+                initial={{ opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: index * 0.06 }}
+                onClick={() => onNavigate(category.destination)}
+                className="sk-collection-card"
+              >
+                <ImageWithFallback src={category.image} alt={`${category.name} collection`} className="sk-cover-image" />
+                <span className="sk-collection-copy">
+                  <span className="sk-collection-index">{category.index}</span>
+                  <span className="sk-collection-title">{category.name}</span>
+                  <span className="sk-collection-detail">{category.detail}<ArrowUpRight className="h-4 w-4" /></span>
                 </span>
-              </span>
-            </motion.button>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="sk-section sk-products-section">
+        <div className="sk-container">
+          <div className="sk-section-heading">
+            <div>
+              <p className="sk-eyebrow">The community loves</p>
+              <h2>Trending Now</h2>
+            </div>
+            <button type="button" onClick={() => onNavigate('main-store')} className="sk-text-link">
+              Explore All <ArrowRight className="ml-1 inline h-4 w-4" />
+            </button>
+          </div>
+          <p className="sk-subtext">Discover what&apos;s hot and loved by our customers.</p>
+          <div className="sk-carousel-wrap">
+            <button type="button" className="sk-carousel-button sk-carousel-prev" aria-label="Previous trending products" onClick={() => scrollTrending(-1)}>
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            {trendingProducts.length > 0 ? (
+              <div ref={trendingRef} className="sk-product-track">
+                {trendingProducts.map((product, index) => (
+                  <div className="sk-product-slide" key={product.id}>
+                    <ProductTile
+                      product={product}
+                      onAddToCart={onAddToCart}
+                      onViewProduct={onViewProduct}
+                      label={index === 0 ? 'Trending' : undefined}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="sk-product-track">
+                {categories.map((category) => (
+                  <button
+                    type="button"
+                    className="sk-product-slide sk-empty-product"
+                    key={category.name}
+                    onClick={() => onNavigate(category.destination)}
+                  >
+                    <ImageWithFallback src={category.image} alt={category.name} className="sk-cover-image" />
+                    <span>{category.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            <button type="button" className="sk-carousel-button sk-carousel-next" aria-label="Next trending products" onClick={() => scrollTrending(1)}>
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="sk-trust-section">
+        <div className="sk-container sk-trust-grid">
+          {[
+            { icon: LockKeyhole, title: 'Discreet Packaging', copy: 'Plain, unmarked packaging for your complete privacy.' },
+            { icon: ShieldCheck, title: 'Secure Payments', copy: 'Safe and secure M-Pesa payment processing.' },
+            { icon: Truck, title: 'Fast Delivery', copy: 'Reliable delivery across Kenya, wherever you are.' }
+          ].map(({ icon: Icon, title, copy }) => (
+            <div className="sk-trust-card" key={title}>
+              <span className="sk-trust-icon"><Icon className="h-6 w-6" strokeWidth={1.7} /></span>
+              <h3>{title}</h3>
+              <p>{copy}</p>
+            </div>
           ))}
         </div>
-        </div>
       </section>
 
-      <section className="homepage-trending py-16 sm:py-24">
-        <div className="mx-auto max-w-7xl px-6 sm:px-8">
-          <div className="flex items-end justify-between gap-4">
-            <SectionHeading
-              eyebrow="The community loves"
-              title="Trending now."
-              copy="The pieces people are coming back for."
-            />
-            {trendingProducts.length > 3 && (
-              <div className="mb-9 hidden gap-2 sm:flex">
-                <button type="button" aria-label="Previous products" onClick={() => scrollTrending(-1)} className="flex h-10 w-10 items-center justify-center border border-[#dfd2d0] transition hover:border-[#241e1e] hover:bg-white">
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <button type="button" aria-label="Next products" onClick={() => scrollTrending(1)} className="flex h-10 w-10 items-center justify-center border border-[#dfd2d0] transition hover:border-[#241e1e] hover:bg-white">
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-            )}
-          </div>
-          {trendingProducts.length > 0 ? (
-            <div ref={trendingRef} className="-mx-6 flex snap-x snap-mandatory gap-5 overflow-x-auto px-6 pb-3 scrollbar-hide sm:mx-0 sm:px-0">
-              {trendingProducts.map((product, index) => (
-                <div key={product.id} className="homepage-trending-item snap-start">
-                  <ProductTile product={product} onAddToCart={onAddToCart} onViewProduct={onViewProduct} label={index === 0 ? 'Most loved' : undefined} />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
-              {categories.slice(0, 4).map((category) => (
-                <button key={category.name} type="button" onClick={() => onNavigate(category.destination)} className="text-left">
-                  <ImageWithFallback src={category.image} alt={category.name} className="aspect-[4/5] w-full object-cover" />
-                  <span className="mt-3 block text-sm font-medium">{category.name}</span>
-                </button>
-              ))}
-            </div>
-          )}
-          <div className="mt-8 flex justify-center sm:justify-start">
-            <Button variant="link" onClick={() => onNavigate('main-store')} className="h-auto p-0 text-xs font-semibold uppercase tracking-[0.17em] text-[#392b2d] hover:text-[#bd637c]">
-              Shop all products <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      <section className="homepage-product-showcase">
-        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-8 sm:py-24">
-        <div className="grid gap-16 lg:grid-cols-2 lg:gap-12">
+      <section className="sk-section sk-featured-sections">
+        <div className="sk-container sk-featured-grid">
           <div>
-            <SectionHeading eyebrow="Worth discovering" title="Best sellers." />
+            <div className="sk-section-heading">
+              <div><p className="sk-eyebrow">Customer favourites</p><h2>Best Sellers</h2></div>
+            </div>
             {bestSellers.length > 0 ? (
-              <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6">
-                {bestSellers.map((product) => (
-                  <ProductTile key={`best-${product.id}`} product={product} onAddToCart={onAddToCart} onViewProduct={onViewProduct} />
-                ))}
+              <div className="sk-small-product-grid">
+                {bestSellers.map((product) => <ProductTile key={`best-${product.id}`} product={product} onAddToCart={onAddToCart} onViewProduct={onViewProduct} />)}
               </div>
             ) : (
-              <button type="button" onClick={() => onNavigate('main-store')} className="group relative block w-full overflow-hidden bg-[#f5f0ee] text-left">
-                <ImageWithFallback src={categoryFallbacks.toys} alt="Explore best-loved intimate essentials" className="aspect-[1.45] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
-                <span className="absolute inset-0 bg-gradient-to-t from-black/65 to-transparent" />
-                <span className="absolute bottom-5 left-5 text-lg font-medium text-white">Find your new favourite <ArrowRight className="ml-2 inline h-4 w-4" /></span>
+              <button type="button" className="sk-editorial-fallback" onClick={() => onNavigate('main-store')}>
+                <ImageWithFallback src={categoryFallbacks.toys} alt="Shop customer favourite products" className="sk-cover-image" />
+                <span>Discover customer favourites <ArrowRight className="ml-2 inline h-4 w-4" /></span>
               </button>
             )}
           </div>
           <div>
-            <SectionHeading eyebrow="Just arrived" title="New arrivals." />
+            <div className="sk-section-heading">
+              <div><p className="sk-eyebrow">Fresh from the collection</p><h2>New Arrivals</h2></div>
+            </div>
             {newArrivals.length > 0 ? (
-              <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6">
-                {newArrivals.map((product) => (
-                  <ProductTile key={`new-${product.id}`} product={product} onAddToCart={onAddToCart} onViewProduct={onViewProduct} label="New" />
-                ))}
+              <div className="sk-small-product-grid">
+                {newArrivals.map((product) => <ProductTile key={`new-${product.id}`} product={product} onAddToCart={onAddToCart} onViewProduct={onViewProduct} label="New" />)}
               </div>
             ) : (
-              <button type="button" onClick={() => onNavigate('lingerie-store')} className="group relative block w-full overflow-hidden bg-[#f5f0ee] text-left">
-                <ImageWithFallback src={categoryFallbacks.lingerie} alt="Discover new lingerie arrivals" className="aspect-[1.45] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
-                <span className="absolute inset-0 bg-gradient-to-t from-black/65 to-transparent" />
-                <span className="absolute bottom-5 left-5 text-lg font-medium text-white">Meet the latest edit <ArrowRight className="ml-2 inline h-4 w-4" /></span>
+              <button type="button" className="sk-editorial-fallback" onClick={() => onNavigate('lingerie-store')}>
+                <ImageWithFallback src={categoryFallbacks.lingerie} alt="Explore new lingerie arrivals" className="sk-cover-image" />
+                <span>Meet the latest edit <ArrowRight className="ml-2 inline h-4 w-4" /></span>
               </button>
             )}
           </div>
         </div>
+      </section>
+
+      <section className="sk-blog-section">
+        <div className="sk-container sk-blog-content">
+          <p className="sk-eyebrow">A little knowledge goes a long way</p>
+          <h2>Discover Our Blog</h2>
+          <p>Explore articles, guides and information about intimate wellness.</p>
+          <Button onClick={() => onNavigate('blog')} className="sk-button sk-button-primary">Read the blog <ArrowRight className="ml-2 h-4 w-4" /></Button>
         </div>
       </section>
 
-      <section className="homepage-contact relative overflow-hidden">
-        <div className="absolute -right-20 -top-32 h-80 w-80 rounded-full border border-white/70 sm:h-[30rem] sm:w-[30rem]" />
-        <div className="absolute -right-10 -top-20 h-60 w-60 rounded-full border border-white/50 sm:h-[24rem] sm:w-[24rem]" />
-        <div className="relative mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 px-6 py-14 sm:px-8 sm:py-20 lg:flex-row lg:items-center">
-          <div className="max-w-2xl">
-            <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.24em] text-[#a46779]">Here for you</p>
-            <h2 className="font-serif text-3xl leading-tight tracking-[-0.035em] text-[#241e1e] sm:text-5xl">
-              A question? We’re always happy to help.
-            </h2>
-            <p className="mt-4 max-w-xl text-sm leading-7 text-[#746668] sm:text-base">
-              Please feel free to contact us for any product enquiries or further information.
-            </p>
+      <section className="sk-contact-section">
+        <div className="sk-container sk-contact-content">
+          <div>
+            <p className="sk-eyebrow">Here for you</p>
+            <h2>Need a little guidance?</h2>
+            <p>Please feel free to contact us for any product enquiries or further information.</p>
           </div>
-          <Button
-            size="lg"
-            onClick={() => onNavigate('contact')}
-            className="homepage-primary-cta h-12 rounded-none px-6 text-sm"
-          >
-            Get in touch <ArrowRight className="ml-3 h-4 w-4" />
-          </Button>
+          <Button onClick={() => onNavigate('contact')} className="sk-button sk-button-primary">Contact us <ArrowRight className="ml-2 h-4 w-4" /></Button>
         </div>
       </section>
+
       <style>{`
-        .homepage-redesign { color: #241e1e; background: #fff; }
-        .homepage-hero { background: #f2d3dc; }
-        .homepage-hero > div { display: grid; grid-template-columns: minmax(0, 1fr); }
-        .homepage-hero-copy { order: 2; padding: 2.25rem 1.5rem 3rem; }
-        .homepage-hero-art { order: 1; height: min(94vw, 560px); min-height: 360px; }
-        .homepage-hero-title { color: #211b1b; font-size: clamp(2.65rem, 10vw, 6.6rem); line-height: .92; letter-spacing: -.065em; }
-        .homepage-accent { color: #ca3d68; }
-        .homepage-eyebrow { color: #805461; }
-        .homepage-subcopy { color: #6e6263; font-size: 1rem; line-height: 1.8; }
-        .homepage-primary-cta { background: #d8476d !important; color: #fff !important; }
-        .homepage-primary-cta:hover { background: #241e1e !important; }
-        .homepage-secondary-cta { border: 1px solid #d8c8c8 !important; background: transparent !important; color: #241e1e !important; }
-        .homepage-secondary-cta:hover { border-color: #d8476d !important; background: rgba(255,255,255,.55) !important; }
-        .homepage-product-image { display: block; aspect-ratio: 4 / 5; }
-        .homepage-category-image { display: block; aspect-ratio: .78; }
-        .homepage-trending-item { width: 72vw; max-width: 285px; flex-shrink: 0; }
-        .homepage-trust { background: #241e1e; border-color: #51343d; color: #fff; }
-        .homepage-trust p:first-child { color: #fff; }
-        .homepage-trust p:last-child { color: #dfb5c0; }
-        .homepage-trust svg { color: #ef8ca8; }
-        .homepage-collections { background: #fff2f6; }
-        .homepage-trending { background: #f1ccd7; }
-        .homepage-product-showcase { background: #241e1e; color: #fff; }
-        .homepage-redesign .homepage-product-showcase h2 { color: #fff; }
-        .homepage-product-showcase .homepage-product-name,
-        .homepage-product-showcase .homepage-product-price { color: #fff; }
-        .homepage-product-showcase .homepage-product-meta { color: #e5aabc; }
-        .homepage-product-showcase .homepage-cart-button { border-color: #6a4651; color: #fff; }
-        .homepage-product-showcase .homepage-cart-button:hover { border-color: #d8476d; background: #d8476d; }
-        .homepage-contact { background: #d65b7b; color: #fff; padding: 3.5rem 0; }
-        .homepage-redesign .homepage-contact h2 { color: #fff; }
-        .homepage-redesign .homepage-contact p { color: #fff0f4; }
-        .homepage-contact .homepage-primary-cta { background: #241e1e !important; }
-        .homepage-contact .homepage-primary-cta:hover { background: #fff !important; color: #241e1e !important; }
-        .homepage-redesign h2 { color: #211b1b; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(2rem, 4vw, 2.75rem); line-height: 1.12; letter-spacing: -.035em; }
-        @media (min-width: 640px) {
-          .homepage-hero-copy { padding: 2.5rem 2.5rem 3rem; }
-          .homepage-trending-item { width: calc((100% - 2.5rem) / 3); max-width: none; }
+        .sk-home { --sk-pink:#b52e62; --sk-hot:#d84d83; --sk-gold:#c49a62; --sk-blush:#fff0f4; --sk-ink:#24151f; --sk-muted:#755d68; --sk-line:#f0e4e9; color:var(--sk-ink); background:#fffdfd; }
+        .sk-home * { box-sizing:border-box; }
+        .sk-home .sk-container { width:min(1180px,92%); margin:0 auto; }
+        .sk-delivery-ribbon { background:#281923; color:#fff; display:flex; justify-content:center; align-items:center; gap:10px; padding:9px 12px; font-size:10px; font-weight:600; letter-spacing:.09em; text-align:center; }
+        .sk-ribbon-separator { color:#e9b9ca; }
+        .sk-hero { position:relative; overflow:hidden; padding:30px 0; background:radial-gradient(circle at 85% 15%,#f6d5e0 0,transparent 35%),linear-gradient(110deg,#fff0f4,#f8e4eb); }
+        .sk-hero:before,.sk-hero:after { content:""; position:absolute; border:1px solid #e7b6c8; border-radius:50%; pointer-events:none; opacity:.55; }
+        .sk-hero:before { width:260px; height:260px; right:-115px; top:-125px; }
+        .sk-hero:after { width:150px; height:150px; right:12%; bottom:-120px; }
+        .sk-hero-grid { position:relative; z-index:1; display:grid; grid-template-columns:1.1fr .9fr; gap:34px; align-items:center; }
+        .sk-hero-copy { padding:20px 0; }
+        .sk-eyebrow { margin:0 0 12px; color:var(--sk-pink); font-size:10px; font-weight:700; letter-spacing:.19em; text-transform:uppercase; }
+        .sk-glowing-heart { display:inline-block; margin-left:5px; font-size:15px; filter:drop-shadow(0 0 5px rgba(235,31,64,.85)); }
+        .sk-hero h1,.sk-section-heading h2,.sk-blog-section h2,.sk-contact-section h2 { margin:0; color:var(--sk-ink); font-family:Georgia,'Times New Roman',serif; }
+        .sk-hero h1 { max-width:600px; font-size:clamp(38px,5vw,62px); line-height:1.07; letter-spacing:-.045em; }
+        .sk-hero h1 em { color:var(--sk-pink); font-style:normal; }
+        .sk-hero-description { max-width:490px; margin:17px 0 24px; color:var(--sk-muted); font-size:14px; line-height:1.75; }
+        .sk-actions { display:flex; flex-wrap:wrap; gap:11px; }
+        .sk-button { min-height:44px; border-radius:5px!important; padding:12px 19px!important; font-size:12px!important; font-weight:700!important; transition:transform .2s,box-shadow .2s,background .2s!important; }
+        .sk-button:hover { transform:translateY(-2px); box-shadow:0 8px 18px #a52e5930; }
+        .sk-button-primary { background:linear-gradient(135deg,#bd356b,#8f214b)!important; color:#fff!important; }
+        .sk-button-outline { border:1px solid var(--sk-pink)!important; background:transparent!important; color:var(--sk-pink)!important; }
+        .sk-hero-photo { position:relative; height:340px; overflow:hidden; border-radius:9px; background:linear-gradient(135deg,#e9bdcc,#f8e9ee,#c987a2); box-shadow:0 18px 40px #6f30421c; }
+        .sk-cover-image { display:block; width:100%; height:100%; object-fit:cover; transition:transform .45s; }
+        .sk-hero-photo:after { position:absolute; content:""; inset:12px; border:1px solid #ffffff9c; border-radius:5px; pointer-events:none; }
+        .sk-featured-product { position:absolute; z-index:1; left:22px; bottom:22px; display:flex; align-items:center; gap:12px; max-width:calc(100% - 44px); padding:11px 15px; border:0; background:#fffF; color:var(--sk-ink); text-align:left; box-shadow:0 8px 22px #29131c24; }
+        .sk-featured-icon { display:grid; width:42px; height:42px; flex:0 0 auto; place-items:center; border-radius:50%; background:var(--sk-blush); color:var(--sk-pink); }
+        .sk-featured-label,.sk-featured-name,.sk-featured-price { display:block; }
+        .sk-featured-label { color:var(--sk-pink); font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
+        .sk-featured-name { overflow:hidden; max-width:220px; margin:3px 0; font-size:12px; font-weight:700; text-overflow:ellipsis; white-space:nowrap; }
+        .sk-featured-price { color:var(--sk-muted); font-size:11px; }
+        .sk-rating-strip { padding:16px 0; border-bottom:1px solid var(--sk-line); background:#fff; }
+        .sk-rating-content { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:12px; text-align:center; }
+        .sk-rating-content strong { font-size:13px; }
+        .sk-rating-content>span:last-child { color:var(--sk-muted); font-size:12px; }
+        .sk-stars { color:var(--sk-gold); font-size:14px; letter-spacing:2px; }
+        .sk-section { padding:55px 0; }
+        .sk-section-heading { display:flex; justify-content:space-between; align-items:center; gap:15px; margin-bottom:23px; }
+        .sk-section-heading .sk-eyebrow { margin-bottom:8px; }
+        .sk-section-heading h2,.sk-blog-section h2,.sk-contact-section h2 { font-size:clamp(25px,3vw,34px); letter-spacing:-.035em; }
+        .sk-text-link { flex:0 0 auto; border:0; background:transparent; color:var(--sk-pink); font-size:12px; font-weight:700; }
+        .sk-text-link:hover { color:var(--sk-hot); }
+        .sk-collections { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px; }
+        .sk-collection-card { position:relative; height:270px; overflow:hidden; padding:0; border:0; border-radius:8px; background:var(--sk-blush); text-align:left; box-shadow:0 10px 25px #2b15200d; }
+        .sk-collection-card:hover .sk-cover-image { transform:scale(1.045); }
+        .sk-collection-card:after { position:absolute; content:""; inset:0; border:1px solid #ffffff35; border-radius:8px; pointer-events:none; }
+        .sk-collection-copy { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end; padding:19px; color:white; background:linear-gradient(0deg,rgba(28,12,22,.82),rgba(28,12,22,.02) 78%); }
+        .sk-collection-index { position:absolute; top:15px; left:16px; font-size:10px; font-weight:700; letter-spacing:.16em; color:#fffC; }
+        .sk-collection-title { margin-bottom:6px; font-family:Georgia,'Times New Roman',serif; font-size:21px; }
+        .sk-collection-detail { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#fffD; }
+        .sk-products-section { background:linear-gradient(110deg,#fff,#fff7f9); }
+        .sk-products-section .sk-section-heading { margin-bottom:18px; }
+        .sk-subtext { margin:-7px 0 22px; color:var(--sk-muted); font-size:13px; }
+        .sk-carousel-wrap { position:relative; }
+        .sk-product-track { display:flex; gap:18px; overflow-x:auto; padding:2px 1px 14px; scroll-behavior:smooth; scroll-snap-type:x mandatory; scrollbar-width:none; }
+        .sk-product-track::-webkit-scrollbar { display:none; }
+        .sk-product-slide { width:calc((100% - 54px)/4); min-width:0; flex:0 0 auto; scroll-snap-align:start; }
+        .sk-carousel-button { position:absolute; z-index:2; top:40%; display:grid; width:38px; height:38px; place-items:center; transform:translateY(-50%); border:1px solid var(--sk-line); border-radius:50%; background:#fff; color:var(--sk-ink); box-shadow:0 2px 10px #0001; }
+        .sk-carousel-button:hover { color:var(--sk-pink); box-shadow:0 5px 15px #a52e591b; }
+        .sk-carousel-prev { left:-17px; }.sk-carousel-next { right:-17px; }
+        .sk-home .homepage-product-image { display:block; aspect-ratio:4/5; background:var(--sk-blush); }
+        .sk-home .group:hover .homepage-product-image { transform:scale(1.04); }
+        .sk-home .homepage-product-meta { color:var(--sk-pink); font-size:9px; }
+        .sk-home .homepage-product-name { color:var(--sk-ink); font-size:13px; line-height:1.4; }
+        .sk-home .homepage-product-price { color:var(--sk-pink); font-size:14px; }
+        .sk-home .homepage-cart-button { border-color:var(--sk-line); color:var(--sk-ink); }
+        .sk-home .homepage-cart-button:hover { border-color:var(--sk-pink); background:var(--sk-pink); color:#fff; }
+        .sk-empty-product { text-align:left; }
+        .sk-empty-product .sk-cover-image { aspect-ratio:4/5; }
+        .sk-empty-product span { display:block; padding-top:10px; font-weight:600; }
+        .sk-trust-section { padding:45px 0; background:linear-gradient(110deg,#fff0f4,#f9e4ec); }
+        .sk-trust-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
+        .sk-trust-card { padding:22px 18px; border:1px solid #f1dce5; border-radius:9px; background:#ffffffad; text-align:center; }
+        .sk-trust-icon { display:grid; width:52px; height:52px; place-items:center; margin:0 auto 13px; border-radius:50%; background:#fff; color:var(--sk-pink); box-shadow:0 5px 16px #a52e5914; }
+        .sk-trust-card h3 { margin:0 0 8px; color:var(--sk-ink); font-size:14px; font-weight:700; }
+        .sk-trust-card p { margin:0; color:var(--sk-muted); font-size:12px; line-height:1.6; }
+        .sk-featured-sections { background:#fff; }
+        .sk-featured-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:42px; }
+        .sk-featured-grid .sk-section-heading h2 { font-size:28px; }
+        .sk-small-product-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:23px 16px; }
+        .sk-small-product-grid .homepage-product-image { aspect-ratio:4/4.5; }
+        .sk-editorial-fallback { position:relative; display:block; width:100%; overflow:hidden; padding:0; border:0; background:var(--sk-blush); text-align:left; }
+        .sk-editorial-fallback .sk-cover-image { aspect-ratio:1.45; }
+        .sk-editorial-fallback span { position:absolute; inset:auto 0 0; padding:20px; color:#fff; background:linear-gradient(transparent,#24151fbf); font-weight:700; }
+        .sk-blog-section { padding:45px 0; background:linear-gradient(110deg,#fff,#fff7f9); text-align:center; }
+        .sk-blog-content .sk-eyebrow { margin-bottom:8px; }
+        .sk-blog-section h2 { font-size:31px; }
+        .sk-blog-section p:not(.sk-eyebrow) { margin:11px 0 19px; color:var(--sk-muted); font-size:13px; }
+        .sk-contact-section { padding:36px 0; background:var(--sk-blush); }
+        .sk-contact-content { display:flex; justify-content:space-between; align-items:center; gap:24px; }
+        .sk-contact-content .sk-eyebrow { margin-bottom:7px; }
+        .sk-contact-content p:not(.sk-eyebrow) { margin:9px 0 0; color:var(--sk-muted); font-size:13px; line-height:1.6; }
+        @media(max-width:900px) { .sk-product-slide { width:calc((100% - 36px)/3); } .sk-collections { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+        @media(max-width:760px) {
+          .sk-delivery-ribbon { gap:7px; padding:8px 7px; font-size:8px; letter-spacing:.055em; }
+          .sk-hero { padding:22px 0; }
+          .sk-hero-grid { grid-template-columns:1fr; gap:17px; }
+          .sk-hero-photo { height:220px; }
+          .sk-hero-copy { padding:5px 0; }
+          .sk-hero h1 { font-size:clamp(34px,9vw,44px); }
+          .sk-hero-description { margin:13px 0 18px; font-size:13px; }
+          .sk-section { padding:38px 0; }
+          .sk-section-heading { margin-bottom:18px; }
+          .sk-section-heading h2 { font-size:24px; }
+          .sk-collections { gap:11px; }
+          .sk-collection-card { height:190px; }
+          .sk-collection-copy { padding:13px; }
+          .sk-collection-title { font-size:17px; }
+          .sk-collection-detail { font-size:8px; letter-spacing:.06em; }
+          .sk-product-slide { width:72%; }
+          .sk-carousel-button { width:33px; height:33px; }
+          .sk-carousel-prev { left:-9px; }.sk-carousel-next { right:-9px; }
+          .sk-trust-section { padding:32px 0; }
+          .sk-trust-grid { grid-template-columns:1fr; gap:12px; }
+          .sk-trust-card { display:grid; grid-template-columns:52px 1fr; column-gap:13px; padding:16px; text-align:left; }
+          .sk-trust-icon { grid-row:span 2; margin:auto; }
+          .sk-trust-card h3 { align-self:end; margin-bottom:3px; }
+          .sk-trust-card p { align-self:start; }
+          .sk-featured-grid { grid-template-columns:1fr; gap:34px; }
+          .sk-small-product-grid { gap:20px 12px; }
+          .sk-blog-section { padding:38px 0; }
+          .sk-blog-section h2 { font-size:26px; }
+          .sk-contact-content { align-items:flex-start; flex-direction:column; gap:18px; }
         }
-        @media (min-width: 1024px) {
-          .homepage-hero > div { grid-template-columns: minmax(0, .83fr) minmax(0, 1.17fr); min-height: 690px; }
-          .homepage-hero-copy { order: 1; padding: 4rem 3.5rem 4rem 4rem; }
-          .homepage-hero-art { order: 2; height: auto; min-height: 690px; }
-          .homepage-subcopy { font-size: 1.125rem; }
-          .homepage-contact { padding: 5rem 0; }
-          .homepage-trending-item { width: calc((100% - 3.75rem) / 4); }
-        }
-        .scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .heart-glow { filter: drop-shadow(0 0 5px rgba(235, 31, 64, .75)); }
+        @media(prefers-reduced-motion:reduce) { .sk-home *, .sk-home *:before, .sk-home *:after { scroll-behavior:auto!important; transition-duration:.01ms!important; } }
       `}</style>
     </main>
   );
